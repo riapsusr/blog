@@ -6,22 +6,50 @@ type Props = {
 }
 
 const { entry } = Astro.props;
+
+// 1. 格式化日期为 MM-DD 形式
+const month = String(entry.data.date.getMonth() + 1).padStart(2, '0');
+const day = String(entry.data.date.getDate()).padStart(2, '0');
+const formattedDate = `${month}-${day}`;
 ---
 
-<a href={`/${entry.collection}/${entry.slug}`} class="relative group flex flex-nowrap py-3 px-4 pr-10 rounded-lg border border-black/15 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-colors duration-300 ease-in-out">
+<a 
+  href={`/${entry.collection}/${entry.slug}`} 
+  class="relative group flex flex-nowrap py-3 px-2 items-start gap-4 rounded-lg border-b border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5 transition-colors duration-300 ease-in-out"
+>
+  <!-- 左侧日期：MM-DD 格式 -->
+  <div class="text-sm tabular-nums opacity-60 flex-shrink-0 pt-1">
+    {formattedDate}
+  </div>
+
+  <!-- 中间内容区 -->
   <div class="flex flex-col flex-1 truncate">
-    <div class="font-semibold">
+    <!-- 2. 标题：加深颜色，使用更重的字重 -->
+    <div class="font-semibold text-black dark:text-white text-base">
       {entry.data.title}
     </div>
-    <div class="text-sm">
+    
+    <!-- 3. 描述内容：小号字，略带透明度 -->
+    <div class="text-sm opacity-60 truncate">
       {entry.data.description}
     </div>
   </div>
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    viewBox="0 0 24 24"
-    class="absolute top-1/2 right-2 -translate-y-1/2 size-5 stroke-2 fill-none stroke-current">
-    <line x1="5" y1="12" x2="19" y2="12" class="translate-x-3 group-hover:translate-x-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out" />
-    <polyline points="12 5 19 12 12 19" class="-translate-x-1 group-hover:translate-x-0 transition-transform duration-300 ease-in-out" />
-  </svg>
+
+  <!-- 右侧动态箭头 -->
+  <div class="flex-shrink-0 ml-2 pt-1">
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      viewBox="0 0 24 24"
+      class="size-5 stroke-2 fill-none stroke-current opacity-30 group-hover:opacity-100 group-hover:text-black group-hover:dark:text-white transition-all duration-300"
+    >
+      <line 
+        x1="5" y1="12" x2="19" y2="12" 
+        class="translate-x-3 group-hover:translate-x-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out" 
+      />
+      <polyline 
+        points="12 5 19 12 12 19" 
+        class="-translate-x-1 group-hover:translate-x-0 transition-transform duration-300 ease-in-out" 
+      />
+    </svg>
+  </div>
 </a>
