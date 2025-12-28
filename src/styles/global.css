@@ -71,3 +71,12 @@ html #back-to-top {
 html.scrolled #back-to-top {
   @apply opacity-100 pointer-events-auto;
 }
+
+body {
+  font-family: "LXGW WenKai Screen", sans-serif;
+}
+
+/* 如果你希望代码块保持等宽字体，可以这样写： */
+code, pre {
+  font-family: "JetBrains Mono", monospace; /* 或者你喜欢的等宽字体 */
+}
