@@ -2,7 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 
 type Props = {
-  entry: CollectionEntry<"blog"> | CollectionEntry<"projects">;
+  entry: CollectionEntry<"blog">;
 }
 
 const { entry } = Astro.props;
@@ -11,10 +11,12 @@ const { entry } = Astro.props;
 const month = String(entry.data.date.getMonth() + 1).padStart(2, '0');
 const day = String(entry.data.date.getDate()).padStart(2, '0');
 const formattedDate = `${month}-${day}`;
+
+const href = `/${entry.collection}/${entry.id.replace(/\.[^/.]+$/, "")}`;
 ---
 
 <a 
-  href={`/${entry.collection}/${entry.slug}`} 
+  href={href}
   class="relative group flex flex-nowrap py-3 px-2 items-start gap-4 rounded-lg border-b border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5 transition-colors duration-300 ease-in-out"
 >
   <!-- 左侧日期：MM-DD 格式 -->
