@@ -7,7 +7,6 @@ type Props = {
 
 const { entry } = Astro.props;
 
-// 1. 格式化日期为 MM-DD 形式
 const month = String(entry.data.date.getMonth() + 1).padStart(2, '0');
 const day = String(entry.data.date.getDate()).padStart(2, '0');
 const formattedDate = `${month}-${day}`;
@@ -17,32 +16,37 @@ const href = `/${entry.collection}/${entry.id.replace(/\.[^/.]+$/, "")}`;
 
 <a 
   href={href}
-  class="relative group flex flex-nowrap py-3 px-2 items-start gap-4 rounded-lg border-b border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5 transition-colors duration-300 ease-in-out"
+  class="relative group flex flex-nowrap py-4 px-4 items-start gap-4 transition-all duration-300 ease-in-out border-b border-black/5 dark:border-white/5 hover:bg-black/[0.08] dark:hover:bg-white/[0.1] -mb-[1px]"
 >
-  <!-- 左侧日期：MM-DD 格式 -->
-  <div class="text-sm tabular-nums opacity-60 flex-shrink-0 pt-1">
+  <!-- 
+    核心优化：
+    1. hover:bg-black/[0.08] - 颜色显著加深，反馈更明确。
+    2. -mb-[1px] - 负边距技巧，确保两篇文章的底边框重合，消除双倍边框。
+    3. px-4 - 稍微加宽左右内边距，让加深区域更饱满。
+    4. 删除了所有 rounded 类，确保直角对接。
+  -->
+
+  <!-- 左侧日期 -->
+  <div class="text-sm tabular-nums opacity-50 flex-shrink-0 pt-1 font-mono">
     {formattedDate}
   </div>
 
   <!-- 中间内容区 -->
   <div class="flex flex-col flex-1 truncate">
-    <!-- 2. 标题：加深颜色，使用更重的字重 -->
-    <div class="font-semibold text-black dark:text-white text-base">
+    <div class="font-medium text-stone-800 dark:text-stone-200 group-hover:text-black group-hover:dark:text-white transition-colors duration-300 text-base">
       {entry.data.title}
     </div>
-    
-    <!-- 3. 描述内容：小号字，略带透明度 -->
-    <div class="text-sm opacity-60 truncate">
+    <div class="text-sm opacity-50 truncate mt-1">
       {entry.data.description}
     </div>
   </div>
 
-  <!-- 右侧动态箭头 -->
-  <div class="flex-shrink-0 ml-2 pt-1">
+  <!-- 右侧箭头 -->
+  <div class="flex-shrink-0 ml-2 pt-1.5">
     <svg 
       xmlns="http://www.w3.org/2000/svg" 
       viewBox="0 0 24 24"
-      class="size-5 stroke-2 fill-none stroke-current opacity-30 group-hover:opacity-100 group-hover:text-black group-hover:dark:text-white transition-all duration-300"
+      class="size-4 stroke-2 fill-none stroke-current opacity-20 group-hover:opacity-100 transition-all duration-300"
     >
       <line 
         x1="5" y1="12" x2="19" y2="12" 

@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+// 如果你已经全面转向 霞鹜文楷，以下字体导入可以根据实际情况保留或移除
 import "@fontsource/inter/latin-400.css";
 import "@fontsource/inter/latin-600.css";
 import "@fontsource/lora/400.css";
@@ -19,7 +20,6 @@ interface Props {
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-
 const { title, description, image = "/nano.png" } = Astro.props;
 ---
 
@@ -59,73 +59,91 @@ const { title, description, image = "/nano.png" } = Astro.props;
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={new URL(image, Astro.url)} />
 
-<ClientRouter  />
+<!-- 开启 Astro 的平滑页面切换 -->
+<ClientRouter />
 
 <!-- RSS Link -->
 <link rel="alternate" type="application/rss+xml" title={SITE.NAME} href={new URL("rss.xml", Astro.site)} />
 
-<script>
-  import type { TransitionBeforeSwapEvent } from "astro:transitions/client";
-  document.addEventListener("astro:before-swap", (e) =>
-    [
-      ...(e as TransitionBeforeSwapEvent).newDocument.head.querySelectorAll(
-        "link[as=\"font\"]"
-      ),
-    ].forEach((link) => link.remove())
-  );
-</script>
-
+<!-- 脚本部分 -->
 <script is:inline>
+  /** 
+   * 极简主题切换逻辑 
+   * 放在 inline 脚本中是为了在页面渲染前执行，防止深色模式闪烁
+   */
+  function toggleTheme(dark) {
+    if (dark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }
+
+  function preloadTheme() {
+    const userTheme = localStorage.theme;
+    if (userTheme === "light" || userTheme === "dark") {
+      toggleTheme(userTheme === "dark");
+    } else {
+      toggleTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
+    }
+  }
+
+  // 立即执行一次
+  preloadTheme();
+
+  /** 
+   * 初始化交互功能
+   */
   function init() {
-    preloadTheme();
     onScroll();
     animate();
 
+    // 绑定返回顶部
     const backToTop = document.getElementById("back-to-top");
-    backToTop?.addEventListener("click", (event) => scrollToTop(event));
+    backToTop?.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
 
+    // 绑定返回上一页
     const backToPrev = document.getElementById("back-to-prev");
     backToPrev?.addEventListener("click", () => window.history.back());
 
-    const lightThemeButton = document.getElementById("light-theme-button");
-    lightThemeButton?.addEventListener("click", () => {
+    // 主题按钮绑定
+    document.getElementById("light-theme-button")?.addEventListener("click", () => {
       localStorage.setItem("theme", "light");
       toggleTheme(false);
     });
 
-    const darkThemeButton = document.getElementById("dark-theme-button");
-    darkThemeButton?.addEventListener("click", () => {
+    document.getElementById("dark-theme-button")?.addEventListener("click", () => {
       localStorage.setItem("theme", "dark");
       toggleTheme(true);
     });
 
-    const systemThemeButton = document.getElementById("system-theme-button");
-    systemThemeButton?.addEventListener("click", () => {
-      localStorage.setItem("theme", "system");
+    document.getElementById("system-theme-button")?.addEventListener("click", () => {
+      localStorage.removeItem("theme"); // 清除缓存以跟随系统
       toggleTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
     });
 
-    window.matchMedia("(prefers-color-scheme: dark)")
-      .addEventListener("change", event => {
-        if (localStorage.theme === "system" || !localStorage.theme) {
-          toggleTheme(event.matches);
-        }
-      }
-    );
+    // 监听系统主题变化
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+      if (!localStorage.theme) toggleTheme(e.matches);
+    });
 
     document.addEventListener("scroll", onScroll);
   }
 
+  /** 页面加载动画：加快了节奏 */
   function animate() {
     const animateElements = document.querySelectorAll(".animate");
-
     animateElements.forEach((element, index) => {
       setTimeout(() => {
         element.classList.add("show");
-      }, index * 150);
+      }, index * 100); // 从 150ms 缩短到 100ms
     });
   }
 
+  /** 滚动处理 */
   function onScroll() {
     if (window.scrollY > 0) {
       document.documentElement.classList.add("scrolled");
@@ -134,53 +152,21 @@ const { title, description, image = "/nano.png" } = Astro.props;
     }
   }
 
-  function scrollToTop(event) {
-    event.preventDefault();
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
-  }
+  // 生命周期监听
+  document.addEventListener("DOMContentLoaded", init);
+  document.addEventListener("astro:after-swap", () => {
+    preloadTheme();
+    init();
+  });
+</script>
 
-function toggleTheme(dark) {
-    const css = document.createElement("style");
-
-    css.appendChild(
-      document.createTextNode(
-        `* {
-             -webkit-transition: none !important;
-             -moz-transition: none !important;
-             -o-transition: none !important;
-             -ms-transition: none !important;
-             transition: none !important;
-          }
-        `,
-      )
-    );
-
-    document.head.appendChild(css);
-
-    if (dark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-
-  window.getComputedStyle(css).opacity;
-    document.head.removeChild(css);
-  }
-
-  function preloadTheme() {
-    const userTheme = localStorage.theme;
-
-    if (userTheme === "light" || userTheme === "dark") {
-      toggleTheme(userTheme === "dark");
-    } else {
-      toggleTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", () => init());
-  document.addEventListener("astro:after-swap", () => init());
-  preloadTheme();
+<script>
+  /** 
+   * 处理 View Transitions 切换时的字体资源移除，防止内存泄漏 
+   */
+  import type { TransitionBeforeSwapEvent } from "astro:transitions/client";
+  document.addEventListener("astro:before-swap", (e) => {
+    const event = e as TransitionBeforeSwapEvent;
+    event.newDocument.head.querySelectorAll('link[as="font"]').forEach((link) => link.remove());
+  });
 </script>

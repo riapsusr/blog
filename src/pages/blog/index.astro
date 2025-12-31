@@ -5,40 +5,47 @@ import Container from "@components/Container.astro";
 import ArrowCard from "@components/ArrowCard.astro";
 import { BLOG } from "@consts";
 
+// 获取博客文章并过滤掉草稿，按时间倒序排序
 const data = (await getCollection("blog"))
   .filter(post => !post.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-  
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
 type Acc = {
   [year: string]: CollectionEntry<"blog">[];
 }
 
+// 将文章按年份分组
 const posts = data.reduce((acc: Acc, post) => {
-    const year = post.data.date.getFullYear().toString();
-    if (!acc[year]) {
-      acc[year] = [];
-    }
-    acc[year].push(post);
-    return acc;
-  }, {});
+  const year = post.data.date.getFullYear().toString();
+  if (!acc[year]) {
+    acc[year] = [];
+  }
+  acc[year].push(post);
+  return acc;
+}, {});
 
-const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a)); 
+// 年份按倒序排列
+const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
 ---
 
 <PageLayout title={BLOG.TITLE} description={BLOG.DESCRIPTION}>
   <Container>
     <div class="space-y-10">
+      <!-- 页面标题 -->
       <div class="animate font-semibold text-black dark:text-white">
         Blog
       </div>
-      <div class="space-y-4">
+
+      <!-- 文章列表区域 -->
+      <div class="space-y-12">
         {years.map(year => (
           <section class="animate space-y-4">
-            <div class="font-semibold text-black dark:text-white">
+            <!-- 年份标题：增加了一点顶部的内边距，使其与上方区分开 -->
+            <div class="font-semibold text-black dark:text-white pt-2">
               {year}
             </div>
             <div>
-              <ul class="flex flex-col gap-4">
+              <ul class="flex flex-col gap-0">
                 {
                   posts[year].map((post) => (
                     <li>

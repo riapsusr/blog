@@ -1,8 +1,9 @@
 ---
 import { getCollection } from "astro:content";
-import { Image } from "astro:assets"; // 导入 Astro 图片优化组件
+import { Image } from "astro:assets";
 import PageLayout from "@layouts/PageLayout.astro";
 import Container from "@components/Container.astro";
+import { INSTANT } from "@consts";
 
 // 获取并按时间倒序排序
 const data = (await getCollection("instant")).sort(
@@ -24,11 +25,6 @@ const instantsByYear = data.reduce((acc, item) => {
 }, {} as Record<string, any[]>);
 
 const years = Object.keys(instantsByYear).sort((a, b) => parseInt(b) - parseInt(a));
-
-const INSTANT = {
-  TITLE: "Instant",
-  DESCRIPTION: "Captured moments, fleeting memories."
-};
 ---
 
 <PageLayout title={INSTANT.TITLE} description={INSTANT.DESCRIPTION}>
@@ -48,30 +44,26 @@ const INSTANT = {
             <div class="space-y-16">
               {instantsByYear[year].map(async (item) => {
                 const { Content } = await item.render();
+                // 仅获取第一张图片
+                const firstImage = item.data.images[0];
+                
                 return (
                   <article class="space-y-4">
-                    {/* 图片展示区 - 使用 Image 组件优化 */}
-                    <div class={`grid gap-2 ${
-                      item.data.images.length === 1 ? 'grid-cols-1' : 
-                      item.data.images.length === 2 ? 'grid-cols-2' : 'grid-cols-3'
-                    }`}>
-                      {item.data.images.map((img: any) => (
-                        <div class="relative aspect-[4/3] overflow-hidden rounded-sm bg-zinc-100 dark:bg-zinc-900">
+                    {/* 图片展示区 - 无圆角、无边框、无阴影，保留亮度交互 */}
+                    {firstImage && (
+                      <div class="instant-image-wrapper">
                         <Image 
-                          src={img} 
+                          src={firstImage} 
                           alt={item.data.location || "Moment"}
-                          /* 调整点：改为 1600 宽度，在大屏幕放大也清晰 */
-                          width={1600} 
-                          /* 调整点：适当调低质量到 70-80，体积会骤降但视觉无损 */
-                          quality={75}
+                          width={1200} 
+                          quality={80}
                           format="webp"
                           loading="lazy" 
                           decoding="async"
-                          class="photo-zoom w-full h-full object-cover cursor-zoom-in hover:opacity-95 transition-opacity"
+                          class="w-full h-auto object-cover"
                         />
-                        </div>
-                      ))}
-                    </div>
+                      </div>
+                    )}
 
                     <div class="text-[13px] text-zinc-400 dark:text-zinc-500 flex items-center gap-2">
                       <time datetime={item.data.date.toISOString()}>
@@ -104,47 +96,4 @@ const INSTANT = {
   .description p {
     margin: 0;
   }
-  
-  /* 优化性能的核心 CSS */
-  .photo-zoom {
-    /* 开启硬件加速，减少缩放时的掉帧 */
-    will-change: transform;
-    transition: opacity 0.3s ease !important;
-  }
-
-  /* 放大后的样式处理 */
-  .medium-zoom-image--opened {
-    /* 放大时取消裁剪，显示完整比例 */
-    object-fit: contain !important; 
-    aspect-ratio: auto !important; 
-    z-index: 100;
-  }
-
-  .medium-zoom-overlay {
-    z-index: 99;
-    background: rgba(255, 255, 255, 0.98) !important;
-  }
-
-  /* 暗色模式适配 */
-  .dark .medium-zoom-overlay {
-    background: rgba(0, 0, 0, 0.95) !important;
-  }
 </style>
-
-<script>
-  import mediumZoom from 'medium-zoom';
-  
-  const initZoom = () => {
-    // 每次执行前先清理，防止重复绑定
-    mediumZoom('.photo-zoom', {
-      background: 'transparent', // 使用 CSS 控制背景色，更流畅
-      margin: 16
-    });
-  };
-
-  // 初始化
-  initZoom();
-  
-  // 适配 Astro 的 View Transitions (页面平滑切换)
-  document.addEventListener('astro:after-swap', initZoom);
-</script>

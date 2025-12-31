@@ -4,41 +4,38 @@ export const SITE: Site = {
   NAME: "Syu's Blog",
   EMAIL: "riapsusr@gmail.com",
   NUM_POSTS_ON_HOMEPAGE: 5,
-  NUM_WORKS_ON_HOMEPAGE: 2,
-  NUM_PROJECTS_ON_HOMEPAGE: 3,
 };
 
 export const HOME: Metadata = {
   TITLE: "Home",
-  DESCRIPTION: "Astro Nano is a minimal and lightweight blog and portfolio.",
+  DESCRIPTION: "Captured moments, fleeting memories.",
 };
 
 export const BLOG: Metadata = {
   TITLE: "Blog",
-  DESCRIPTION: "A collection of articles on topics I am passionate about.",
+  DESCRIPTION: "记录思考，分享见闻。",
 };
 
-export const WORK: Metadata = {
-  TITLE: "Work",
-  DESCRIPTION: "Where I have worked and what I have done.",
-};
-
-export const PROJECTS: Metadata = {
-  TITLE: "Projects",
-  DESCRIPTION: "A collection of my projects, with links to repositories and demos.",
+export const INSTANT: Metadata = {
+  TITLE: "Instant",
+  DESCRIPTION: "Captured moments, fleeting memories.",
 };
 
 export const SOCIALS: Socials = [
   { 
     NAME: "Twitter",
-    HREF: "https://twitter.com/riapsusr",
+    HREF: "https://x.com/riapsusr", // 建议更新为 x.com
   },
   { 
     NAME: "Telegram",
     HREF: "https://t.me/riapsusr"
   },
-  // { 
-  //   NAME: "linkedin",
-  //   HREF: "https://www.linkedin.com/in/markhorn-dev",
-  // }
+  {
+    NAME: "Email",
+    HREF: "mailto:riapsusr@gmail.com"
+  },
+  {
+    NAME: "RSS",
+    HREF: "/rss.xml"
+  }
 ];

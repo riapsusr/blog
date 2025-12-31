@@ -51,6 +51,15 @@ article {
   @apply prose-headings:text-black prose-headings:dark:text-white;
 }
 
+/* 移除博客图片的圆角、边框、阴影，保留交互亮度 */
+article img {
+  @apply rounded-none border-none shadow-none transition-all duration-300;
+}
+
+article img:hover {
+  @apply brightness-105 dark:brightness-110;
+}
+
 code, pre {
   font-family: "JetBrains Mono", "Cascadia Code", monospace !important;
 }
@@ -105,35 +114,22 @@ html.scrolled #back-to-top {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.instant-images {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-  gap: 0.75rem;
+/* 移除 Instant 图片的圆角、边框、阴影 */
+.instant-image-wrapper {
+  @apply relative overflow-hidden rounded-none bg-zinc-200 dark:bg-zinc-800;
+}
+
+.instant-image-wrapper img {
+  @apply w-full h-auto block transition-all duration-500;
+}
+
+/* 保留交互时的亮度变化 */
+.instant-image-wrapper:hover img {
+  @apply brightness-105 dark:brightness-110;
 }
 
 /* ----------------------------------------------------------------
-   5. Medium Zoom 性能优化样式
----------------------------------------------------------------- */
-
-.medium-zoom-overlay {
-  z-index: 99;
-  /* 修复点：将 backdrop-blur-md 移入 @apply */
-  @apply bg-stone-100/95 dark:bg-stone-900/95 backdrop-blur-md !important;
-}
-
-.medium-zoom-image--opened {
-  z-index: 100;
-  will-change: transform;
-  object-fit: contain !important;
-  border-radius: 0 !important;
-}
-
-.photo-zoom, article img {
-  @apply cursor-zoom-in transition-opacity hover:opacity-90;
-}
-
-/* ----------------------------------------------------------------
-   6. 滚动条美化
+   5. 滚动条美化
 ---------------------------------------------------------------- */
 ::-webkit-scrollbar {
   width: 6px;
