@@ -1,15 +1,5 @@
 ---
 import "../styles/global.css";
-// 如果你已经全面转向 霞鹜文楷，以下字体导入可以根据实际情况保留或移除
-import "@fontsource/inter/latin-400.css";
-import "@fontsource/inter/latin-600.css";
-import "@fontsource/lora/400.css";
-import "@fontsource/lora/600.css";
-import inter400 from "@fontsource/inter/files/inter-latin-400-normal.woff2";
-import inter600 from "@fontsource/inter/files/inter-latin-600-normal.woff2";
-import lora400 from "@fontsource/lora/files/lora-latin-400-normal.woff2";
-import lora600 from "@fontsource/lora/files/lora-latin-600-normal.woff2";
-
 import { ClientRouter } from "astro:transitions";
 import { SITE } from "@consts";
 
@@ -31,11 +21,10 @@ const { title, description, image = "/nano.png" } = Astro.props;
 <link rel="icon" type="image/x-icon" href="/favicon.svg">
 <meta name="generator" content={Astro.generator} />
 
-<!-- Font preloads -->
-<link rel="preload" href={inter400} as="font" type="font/woff2" crossorigin/>
-<link rel="preload" href={inter600} as="font" type="font/woff2" crossorigin/>
-<link rel="preload" href={lora400} as="font" type="font/woff2" crossorigin/>
-<link rel="preload" href={lora600} as="font" type="font/woff2" crossorigin/>
+<!-- 
+  注意：这里删除了所有的 font preload (inter/lora)，
+  因为你现在主要使用 霞鹜文楷。这样可以解决报错并提升加载速度。
+-->
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
@@ -65,12 +54,8 @@ const { title, description, image = "/nano.png" } = Astro.props;
 <!-- RSS Link -->
 <link rel="alternate" type="application/rss+xml" title={SITE.NAME} href={new URL("rss.xml", Astro.site)} />
 
-<!-- 脚本部分 -->
+<!-- 脚本部分：包含主题切换、滚动监听、入场动画 -->
 <script is:inline>
-  /** 
-   * 极简主题切换逻辑 
-   * 放在 inline 脚本中是为了在页面渲染前执行，防止深色模式闪烁
-   */
   function toggleTheme(dark) {
     if (dark) {
       document.documentElement.classList.add("dark");
@@ -88,28 +73,21 @@ const { title, description, image = "/nano.png" } = Astro.props;
     }
   }
 
-  // 立即执行一次
   preloadTheme();
 
-  /** 
-   * 初始化交互功能
-   */
   function init() {
     onScroll();
     animate();
 
-    // 绑定返回顶部
     const backToTop = document.getElementById("back-to-top");
     backToTop?.addEventListener("click", (e) => {
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
-    // 绑定返回上一页
     const backToPrev = document.getElementById("back-to-prev");
     backToPrev?.addEventListener("click", () => window.history.back());
 
-    // 主题按钮绑定
     document.getElementById("light-theme-button")?.addEventListener("click", () => {
       localStorage.setItem("theme", "light");
       toggleTheme(false);
@@ -121,11 +99,10 @@ const { title, description, image = "/nano.png" } = Astro.props;
     });
 
     document.getElementById("system-theme-button")?.addEventListener("click", () => {
-      localStorage.removeItem("theme"); // 清除缓存以跟随系统
+      localStorage.removeItem("theme");
       toggleTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
     });
 
-    // 监听系统主题变化
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
       if (!localStorage.theme) toggleTheme(e.matches);
     });
@@ -133,17 +110,15 @@ const { title, description, image = "/nano.png" } = Astro.props;
     document.addEventListener("scroll", onScroll);
   }
 
-  /** 页面加载动画：加快了节奏 */
   function animate() {
     const animateElements = document.querySelectorAll(".animate");
     animateElements.forEach((element, index) => {
       setTimeout(() => {
         element.classList.add("show");
-      }, index * 100); // 从 150ms 缩短到 100ms
+      }, index * 100);
     });
   }
 
-  /** 滚动处理 */
   function onScroll() {
     if (window.scrollY > 0) {
       document.documentElement.classList.add("scrolled");
@@ -152,21 +127,9 @@ const { title, description, image = "/nano.png" } = Astro.props;
     }
   }
 
-  // 生命周期监听
   document.addEventListener("DOMContentLoaded", init);
   document.addEventListener("astro:after-swap", () => {
     preloadTheme();
     init();
-  });
-</script>
-
-<script>
-  /** 
-   * 处理 View Transitions 切换时的字体资源移除，防止内存泄漏 
-   */
-  import type { TransitionBeforeSwapEvent } from "astro:transitions/client";
-  document.addEventListener("astro:before-swap", (e) => {
-    const event = e as TransitionBeforeSwapEvent;
-    event.newDocument.head.querySelectorAll('link[as="font"]').forEach((link) => link.remove());
   });
 </script>

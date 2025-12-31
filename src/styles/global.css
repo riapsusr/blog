@@ -9,6 +9,7 @@ html {
   overflow-y: scroll;
   color-scheme: light;
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 html.dark {
@@ -25,7 +26,9 @@ body {
   @apply flex flex-col;
   @apply bg-stone-100 dark:bg-stone-900;
   @apply text-black/50 dark:text-white/75;
-  font-family: "LXGW WenKai Screen", "LXGW WenKai", sans-serif;
+  font-family: "LXGW WenKai Screen", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 header {
@@ -47,11 +50,20 @@ footer {
 ---------------------------------------------------------------- */
 article {
   @apply max-w-full prose dark:prose-invert prose-img:mx-auto prose-img:my-auto;
-  @apply prose-headings:font-semibold prose-p:font-serif;
+  font-family: "LXGW WenKai Screen", sans-serif !important;
+  @apply prose-headings:font-semibold;
   @apply prose-headings:text-black prose-headings:dark:text-white;
+
+  /* 全局两端对齐优化 */
+  text-align: justify;
+  text-justify: inter-character;
 }
 
-/* 移除博客图片的圆角、边框、阴影，保留交互亮度 */
+article p, article h1, article h2, article h3, article h4, article h5, article h6, 
+article li, article blockquote, .description, .description p {
+  font-family: "LXGW WenKai Screen", sans-serif !important;
+}
+
 article img {
   @apply rounded-none border-none shadow-none transition-all duration-300;
 }
@@ -97,8 +109,12 @@ html.scrolled #back-to-top {
 }
 
 /* ----------------------------------------------------------------
-   4. Instant 页面专用样式
+   4. 容器与侧边距优化 (针对手机端)
 ---------------------------------------------------------------- */
+.mx-auto.max-w-screen-sm {
+  @apply px-7 sm:px-5;
+}
+
 .instant-page {
   max-width: 720px;
   margin: 0 auto;
@@ -114,7 +130,6 @@ html.scrolled #back-to-top {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* 移除 Instant 图片的圆角、边框、阴影 */
 .instant-image-wrapper {
   @apply relative overflow-hidden rounded-none bg-zinc-200 dark:bg-zinc-800;
 }
@@ -123,7 +138,6 @@ html.scrolled #back-to-top {
   @apply w-full h-auto block transition-all duration-500;
 }
 
-/* 保留交互时的亮度变化 */
 .instant-image-wrapper:hover img {
   @apply brightness-105 dark:brightness-110;
 }
