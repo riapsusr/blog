@@ -10,13 +10,20 @@ const blog = defineCollection({
   }),
 });
 
+// const instant = defineCollection({
+//   type: 'content',
+//   schema: z.object({
+//     date: z.coerce.date(),
+//     location: z.string(),
+//     images: z.array(z.string()),
+//   }),
+// });
 const instant = defineCollection({
-  type: 'content',
-  schema: z.object({
+  schema: ({ image }) => z.object({
     date: z.coerce.date(),
     location: z.string(),
-    images: z.array(z.string()),
+    // 关键：告诉 Astro 这是本地图片文件
+    images: z.array(image()), 
   }),
 });
-
 export const collections = { blog, instant };

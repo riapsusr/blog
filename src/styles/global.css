@@ -2,9 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ----------------------------------------------------------------
+   1. 基础布局与主题
+---------------------------------------------------------------- */
 html {
   overflow-y: scroll;
   color-scheme: light;
+  scroll-behavior: smooth;
 }
 
 html.dark {
@@ -21,6 +25,7 @@ body {
   @apply flex flex-col;
   @apply bg-stone-100 dark:bg-stone-900;
   @apply text-black/50 dark:text-white/75;
+  font-family: "LXGW WenKai Screen", "LXGW WenKai", sans-serif;
 }
 
 header {
@@ -37,10 +42,17 @@ footer {
   @apply py-5 text-sm;
 }
 
+/* ----------------------------------------------------------------
+   2. 博客文章样式 (Typography / Prose)
+---------------------------------------------------------------- */
 article {
   @apply max-w-full prose dark:prose-invert prose-img:mx-auto prose-img:my-auto;
   @apply prose-headings:font-semibold prose-p:font-serif;
   @apply prose-headings:text-black prose-headings:dark:text-white;
+}
+
+code, pre {
+  font-family: "JetBrains Mono", "Cascadia Code", monospace !important;
 }
 
 @layer utilities {
@@ -55,6 +67,9 @@ article {
   }
 }
 
+/* ----------------------------------------------------------------
+   3. 动画与交互
+---------------------------------------------------------------- */
 .animate {
   @apply opacity-0 translate-y-3;
   @apply transition-all duration-700 ease-out;
@@ -72,58 +87,62 @@ html.scrolled #back-to-top {
   @apply opacity-100 pointer-events-auto;
 }
 
-body {
-  font-family: "LXGW WenKai Screen", sans-serif;
-}
-
-/* 如果你希望代码块保持等宽字体，可以这样写： */
-code, pre {
-  font-family: "JetBrains Mono", monospace; /* 或者你喜欢的等宽字体 */
-}
-
-/* 页面整体 */
+/* ----------------------------------------------------------------
+   4. Instant 页面专用样式
+---------------------------------------------------------------- */
 .instant-page {
   max-width: 720px;
   margin: 0 auto;
   padding: 4rem 1.5rem;
 }
 
-/* 标题 */
-.instant-title {
-  text-align: center;
-  margin-bottom: 4rem;
-}
-
-/* 单条记录 */
 .instant-item {
   padding: 3rem 0;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* 图片行 */
+.dark .instant-item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 .instant-images {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   gap: 0.75rem;
 }
 
-.instant-images img {
-  width: 100%;
-  border-radius: 6px;
-  cursor: zoom-in;
+/* ----------------------------------------------------------------
+   5. Medium Zoom 性能优化样式
+---------------------------------------------------------------- */
+
+.medium-zoom-overlay {
+  z-index: 99;
+  /* 修复点：将 backdrop-blur-md 移入 @apply */
+  @apply bg-stone-100/95 dark:bg-stone-900/95 backdrop-blur-md !important;
 }
 
-/* 日期 + 地点 */
-.instant-meta {
-  margin-top: 0.75rem;
-  font-size: 0.85rem;
-  color: #888;
+.medium-zoom-image--opened {
+  z-index: 100;
+  will-change: transform;
+  object-fit: contain !important;
+  border-radius: 0 !important;
 }
 
-/* 描述 */
-.instant-desc {
-  margin-top: 1rem;
-  text-align: justify;
-  line-height: 1.7;
+.photo-zoom, article img {
+  @apply cursor-zoom-in transition-opacity hover:opacity-90;
 }
 
+/* ----------------------------------------------------------------
+   6. 滚动条美化
+---------------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-stone-300 dark:bg-stone-700 rounded-full;
+}

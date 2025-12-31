@@ -2,7 +2,7 @@
 date: 2025-12-31
 location: 济南大明湖
 images:
-  - https://p6.itc.cn/images01/20230906/213d4491383149049cafa7cf504be924.jpeg
+  - ./bridge-9175733.jpg
 ---
 
 傍晚的湖面很平静，风不大，

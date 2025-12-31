@@ -37,8 +37,43 @@ const { Content } = await render(post);
         {post.data.title}
       </div>
     </div>
-    <article class="animate">
+    
+    <!-- 添加了 prose-img:cursor-zoom-in 让鼠标指针变成放大镜 -->
+    <article class="animate prose-img:cursor-zoom-in">
       <Content />
     </article>
   </Container>
 </PageLayout>
+
+<style is:global>
+  /* 1. 确保图片在放大时层级最高 */
+  .medium-zoom-image--opened {
+    z-index: 100;
+    /* 解决 5MB 大图放大时的平滑度 */
+    will-change: transform;
+  }
+  
+  /* 2. 放大时的背景层级 */
+  .medium-zoom-overlay {
+    z-index: 99;
+    /* 自动适配全局 CSS 里的浅色/深色背景 */
+    @apply bg-stone-100/95 dark:bg-stone-900/95 !important;
+  }
+</style>
+
+<script>
+  import mediumZoom from 'medium-zoom';
+  
+  const initZoom = () => {
+    // 针对博客文章内的所有图片初始化放大功能
+    mediumZoom('article img', {
+      margin: 24,
+      background: 'transparent', // 背景颜色由上面的 CSS 控制，性能更好
+    });
+  };
+
+  // 首次加载初始化
+  initZoom();
+  // 适配 View Transitions 切换初始化
+  document.addEventListener('astro:after-swap', initZoom);
+</script>
