@@ -8,7 +8,8 @@
 html {
   overflow-y: scroll;
   color-scheme: light;
-  scroll-behavior: smooth;
+  /* 强制禁用平滑滚动，防止页面切换时产生的拉扯感 */
+  scroll-behavior: auto !important; 
   -webkit-text-size-adjust: 100%;
 }
 
@@ -53,8 +54,6 @@ article {
   font-family: "LXGW WenKai Screen", sans-serif !important;
   @apply prose-headings:font-semibold;
   @apply prose-headings:text-black prose-headings:dark:text-white;
-
-  /* 全局两端对齐优化 */
   text-align: justify;
   text-justify: inter-character;
 }
@@ -89,15 +88,16 @@ code, pre {
 }
 
 /* ----------------------------------------------------------------
-   3. 动画与交互
+   3. 静态化处理 (取消动画)
 ---------------------------------------------------------------- */
+/* 
+   保留 .animate 类名以兼容 HTML 结构，
+   但将其改为瞬间显示，无位移、无透明度变化、无过渡。
+*/
 .animate {
-  @apply opacity-0 translate-y-3;
-  @apply transition-all duration-700 ease-out;
-}
-
-.animate.show {
-  @apply opacity-100 translate-y-0;
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
 }
 
 html #back-to-top {
@@ -109,7 +109,7 @@ html.scrolled #back-to-top {
 }
 
 /* ----------------------------------------------------------------
-   4. 容器与侧边距优化 (针对手机端)
+   4. 容器与侧边距优化
 ---------------------------------------------------------------- */
 .mx-auto.max-w-screen-sm {
   @apply px-7 sm:px-5;

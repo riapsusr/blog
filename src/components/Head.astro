@@ -15,18 +15,12 @@ const { title, description, image = "/nano.png" } = Astro.props;
 
 <!-- Global Metadata -->
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" media="(prefers-color-scheme: dark)">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" media="(prefers-color-scheme: light)">
 <link rel="icon" type="image/x-icon" href="/favicon.svg">
 <meta name="generator" content={Astro.generator} />
 
-<!-- 
-  注意：这里删除了所有的 font preload (inter/lora)，
-  因为你现在主要使用 霞鹜文楷。这样可以解决报错并提升加载速度。
--->
-
-<!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
 
 <!-- Primary Meta Tags -->
@@ -48,88 +42,68 @@ const { title, description, image = "/nano.png" } = Astro.props;
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={new URL(image, Astro.url)} />
 
-<!-- 开启 Astro 的平滑页面切换 -->
-<ClientRouter />
-
-<!-- RSS Link -->
 <link rel="alternate" type="application/rss+xml" title={SITE.NAME} href={new URL("rss.xml", Astro.site)} />
 
-<!-- 脚本部分：包含主题切换、滚动监听、入场动画 -->
+<!-- 开启 Astro 平滑页面切换 -->
+<ClientRouter />
+
 <script is:inline>
-  function toggleTheme(dark) {
-    if (dark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+  // 1. 主题切换
+  function applyTheme() {
+    const theme = localStorage.getItem("theme") || 
+      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.classList.toggle("dark", theme === "dark");
   }
 
-  function preloadTheme() {
-    const userTheme = localStorage.theme;
-    if (userTheme === "light" || userTheme === "dark") {
-      toggleTheme(userTheme === "dark");
-    } else {
-      toggleTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
-    }
-  }
-
-  preloadTheme();
-
+  // 2. 页面交互初始化 (去掉了动画)
   function init() {
     onScroll();
-    animate();
 
     const backToTop = document.getElementById("back-to-top");
-    backToTop?.addEventListener("click", (e) => {
-      e.preventDefault();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
+    if (backToTop) {
+      backToTop.onclick = (e) => {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "auto" });
+      };
+    }
 
     const backToPrev = document.getElementById("back-to-prev");
-    backToPrev?.addEventListener("click", () => window.history.back());
+    if (backToPrev) {
+      backToPrev.onclick = () => window.history.back();
+    }
 
-    document.getElementById("light-theme-button")?.addEventListener("click", () => {
-      localStorage.setItem("theme", "light");
-      toggleTheme(false);
-    });
+    const setupBtn = (id, theme) => {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.onclick = () => {
+          if (theme === "system") localStorage.removeItem("theme");
+          else localStorage.setItem("theme", theme);
+          applyTheme();
+        };
+      }
+    };
 
-    document.getElementById("dark-theme-button")?.addEventListener("click", () => {
-      localStorage.setItem("theme", "dark");
-      toggleTheme(true);
-    });
-
-    document.getElementById("system-theme-button")?.addEventListener("click", () => {
-      localStorage.removeItem("theme");
-      toggleTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
-    });
-
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
-      if (!localStorage.theme) toggleTheme(e.matches);
-    });
-
-    document.addEventListener("scroll", onScroll);
-  }
-
-  function animate() {
-    const animateElements = document.querySelectorAll(".animate");
-    animateElements.forEach((element, index) => {
-      setTimeout(() => {
-        element.classList.add("show");
-      }, index * 100);
-    });
+    setupBtn("light-theme-button", "light");
+    setupBtn("dark-theme-button", "dark");
+    setupBtn("system-theme-button", "system");
   }
 
   function onScroll() {
-    if (window.scrollY > 0) {
-      document.documentElement.classList.add("scrolled");
-    } else {
-      document.documentElement.classList.remove("scrolled");
-    }
+    const isScrolled = window.scrollY > 0;
+    document.documentElement.classList.toggle("scrolled", isScrolled);
   }
 
+  // 初始执行
+  applyTheme();
   document.addEventListener("DOMContentLoaded", init);
+
+  // 3. 处理页面跳转
   document.addEventListener("astro:after-swap", () => {
-    preloadTheme();
+    // 强制立即回到顶部
+    window.scrollTo(0, 0); 
+    applyTheme();
     init();
   });
+
+  window.addEventListener("scroll", onScroll, { passive: true });
 </script>

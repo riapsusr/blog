@@ -18,38 +18,8 @@ const { title, description } = Astro.props;
 <!doctype html>
 <html lang="zh-CN">
   <head>
-    <!-- 主题初始化脚本：放在最前面以防止 FOUC（样式闪烁） -->
-    <script is:inline>
-      function themeInit() {
-        const theme = (() => {
-          if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
-            return localStorage.getItem("theme");
-          }
-          if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-            return "dark";
-          }
-          return "light";
-        })();
-
-        if (theme === "dark") {
-          document.documentElement.classList.add("dark");
-        } else {
-          document.documentElement.classList.remove("dark");
-        }
-        window.localStorage.setItem("theme", theme);
-      }
-      
-      themeInit();
-      // 适配 View Transitions 的页面切换
-      document.addEventListener("astro:after-swap", themeInit);
-    </script>
-    
     <Head title={`${title} | ${SITE.NAME}`} description={description} />
-    
-    <!-- 引入 霞鹜文楷 屏幕阅读版 -->
     <link rel="stylesheet" href="https://npm.elemecdn.com/lxgw-wenkai-screen-webfont@1.1.0/style.css" />
-    
-    <!-- 开启全局平滑过渡 -->
     <ClientRouter />
   </head>
   <body class="bg-stone-100 dark:bg-stone-900 transition-colors duration-300">
@@ -58,8 +28,6 @@ const { title, description } = Astro.props;
       <slot />
     </main>
     <Footer />
-    
-    <!-- Vercel 统计 -->
     <Analytics />
     <SpeedInsights />
   </body>
