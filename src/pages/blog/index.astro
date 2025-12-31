@@ -5,7 +5,6 @@ import Container from "@components/Container.astro";
 import ArrowCard from "@components/ArrowCard.astro";
 import { BLOG } from "@consts";
 
-// 获取博客文章并过滤掉草稿，按时间倒序排序
 const data = (await getCollection("blog"))
   .filter(post => !post.data.draft)
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
@@ -14,7 +13,6 @@ type Acc = {
   [year: string]: CollectionEntry<"blog">[];
 }
 
-// 将文章按年份分组
 const posts = data.reduce((acc: Acc, post) => {
   const year = post.data.date.getFullYear().toString();
   if (!acc[year]) {
@@ -24,24 +22,20 @@ const posts = data.reduce((acc: Acc, post) => {
   return acc;
 }, {});
 
-// 年份按倒序排列
 const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
 ---
 
 <PageLayout title={BLOG.TITLE} description={BLOG.DESCRIPTION}>
   <Container>
     <div class="space-y-10">
-      <!-- 页面标题 -->
-      <div class="animate font-semibold text-black dark:text-white">
+      <div class="animate font-semibold text-black dark:text-white px-3">
         Blog
       </div>
 
-      <!-- 文章列表区域 -->
       <div class="space-y-12">
         {years.map(year => (
           <section class="animate space-y-4">
-            <!-- 年份标题：增加了一点顶部的内边距，使其与上方区分开 -->
-            <div class="font-semibold text-black dark:text-white pt-2">
+            <div class="font-semibold text-black dark:text-white pt-10 px-3">
               {year}
             </div>
             <div>

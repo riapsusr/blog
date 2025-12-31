@@ -5,7 +5,6 @@ import PageLayout from "@layouts/PageLayout.astro";
 import Container from "@components/Container.astro";
 import { INSTANT } from "@consts";
 
-// 获取并按时间倒序排序
 const data = (await getCollection("instant")).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime()
 );
@@ -14,7 +13,6 @@ const formatDate = (date: Date) => {
   return date.toISOString().split('T')[0];
 };
 
-// 将数据按年份分组
 const instantsByYear = data.reduce((acc, item) => {
   const year = item.data.date.getFullYear().toString();
   if (!acc[year]) {
@@ -30,26 +28,24 @@ const years = Object.keys(instantsByYear).sort((a, b) => parseInt(b) - parseInt(
 <PageLayout title={INSTANT.TITLE} description={INSTANT.DESCRIPTION}>
   <Container>
     <div class="space-y-10">
-      <div class="animate font-semibold text-black dark:text-white">
+      <div class="animate font-semibold text-black dark:text-white px-3">
         Instant
       </div>
 
       <div class="space-y-12">
         {years.map(year => (
-          <section class="animate space-y-8">
-            <div class="font-semibold text-black dark:text-white pt-4">
+          <section class="animate space-y-4">
+            <div class="font-semibold text-black dark:text-white pt-10 px-3">
               {year}
             </div>
 
             <div class="space-y-16">
               {instantsByYear[year].map(async (item) => {
                 const { Content } = await item.render();
-                // 仅获取第一张图片
                 const firstImage = item.data.images[0];
                 
                 return (
-                  <article class="space-y-4">
-                    {/* 图片展示区 - 无圆角、无边框、无阴影，保留亮度交互 */}
+                  <article class="space-y-4 px-3">
                     {firstImage && (
                       <div class="instant-image-wrapper">
                         <Image 

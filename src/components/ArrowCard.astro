@@ -16,18 +16,16 @@ const href = `/${entry.collection}/${entry.id.replace(/\.[^/.]+$/, "")}`;
 
 <a 
   href={href}
-  class="relative group flex flex-nowrap py-4 px-4 items-start gap-4 transition-all duration-300 ease-in-out border-b border-black/5 dark:border-white/5 hover:bg-black/[0.08] dark:hover:bg-white/[0.1] -mb-[1px]"
+  class="relative group flex flex-nowrap py-4 px-3 items-center gap-4 transition-all duration-300 ease-in-out border-b border-black/5 dark:border-white/5 hover:bg-black/[0.08] dark:hover:bg-white/[0.1] -mb-[1px] rounded-none shadow-none"
 >
   <!-- 
-    核心优化：
-    1. hover:bg-black/[0.08] - 颜色显著加深，反馈更明确。
-    2. -mb-[1px] - 负边距技巧，确保两篇文章的底边框重合，消除双倍边框。
-    3. px-4 - 稍微加宽左右内边距，让加深区域更饱满。
-    4. 删除了所有 rounded 类，确保直角对接。
+    核心改动：
+    1. items-center: 让左侧日期、中间文字、右侧箭头在垂直方向上完美居中对齐。
+    2. 删除了日期和箭头 div 上的 pt-1 和 pt-1.5。
   -->
 
   <!-- 左侧日期 -->
-  <div class="text-sm tabular-nums opacity-50 flex-shrink-0 pt-1 font-mono">
+  <div class="text-sm tabular-nums opacity-50 flex-shrink-0 font-mono">
     {formattedDate}
   </div>
 
@@ -42,7 +40,7 @@ const href = `/${entry.collection}/${entry.id.replace(/\.[^/.]+$/, "")}`;
   </div>
 
   <!-- 右侧箭头 -->
-  <div class="flex-shrink-0 ml-2 pt-1.5">
+  <div class="flex-shrink-0 ml-2">
     <svg 
       xmlns="http://www.w3.org/2000/svg" 
       viewBox="0 0 24 24"
