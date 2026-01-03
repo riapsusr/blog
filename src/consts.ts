@@ -4,27 +4,28 @@ export const SITE: Site = {
   NAME: "Syu's Blog",
   EMAIL: "riapsusr@gmail.com",
   NUM_POSTS_ON_HOMEPAGE: 5,
+  NUM_INSTANTS_ON_HOMEPAGE: 3
 };
 
 export const HOME: Metadata = {
-  TITLE: "Home",
-  DESCRIPTION: "Captured moments, fleeting memories.",
+  TITLE: "主页",
+  DESCRIPTION: "",
 };
 
-export const BLOG: Metadata = {
-  TITLE: "Blog",
-  DESCRIPTION: "记录思考，分享见闻。",
+export const POSTS: Metadata = {
+  TITLE: "文章",
+  DESCRIPTION: "",
 };
 
-export const INSTANT: Metadata = {
-  TITLE: "Instant",
-  DESCRIPTION: "Captured moments, fleeting memories.",
+export const INSTANTS: Metadata = {
+  TITLE: "刹那",
+  DESCRIPTION: "",
 };
 
 export const SOCIALS: Socials = [
   { 
     NAME: "Twitter",
-    HREF: "https://x.com/riapsusr", // 建议更新为 x.com
+    HREF: "https://x.com/riapsusr",
   },
   { 
     NAME: "Telegram",
