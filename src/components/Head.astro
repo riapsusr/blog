@@ -22,11 +22,15 @@ const { title, description, image = "/nano.png" } = Astro.props;
 <meta name="title" content={title} />
 <meta name="description" content={description} />
 
-<!-- Google Fonts Noto Serif SC: iPhone 兼容性最好 -->
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+<meta property="og:type" content="website" />
+<meta property="og:url" content={Astro.url} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={new URL(image, Astro.url)} />
+<meta property="twitter:card" content="summary_large_image" />
 
-<ClientRouter fallback="swap" />
 <link rel="alternate" type="application/rss+xml" title={SITE.NAME} href={new URL("rss.xml", Astro.site)} />
+<ClientRouter fallback="swap" />
 
 <script is:inline>
   function applyTheme() {

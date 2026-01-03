@@ -2,7 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 1. 基础布局 */
+/* ----------------------------------------------------------------
+   1. 全站字体“核武”级覆盖
+---------------------------------------------------------------- */
+
+/* 强制全站所有元素（除了代码块相关）使用文楷 */
+*, *::before, *::after {
+  font-family: "LXGW WenKai Screen", "LXGWWenKaiScreen", "Songti SC", "Source Han Serif CN", serif !important;
+}
+
+/* 唯独排除代码块，保持等宽字体 */
+code, pre, kbd, samp, .mono {
+  font-family: "JetBrains Mono", "Cascadia Code", monospace !important;
+}
+
+/* ----------------------------------------------------------------
+   2. 基础布局
+---------------------------------------------------------------- */
 html {
   overflow-y: scroll;
   color-scheme: light;
@@ -14,52 +30,57 @@ html.dark { color-scheme: dark; }
 html, body { @apply size-full; }
 
 body {
-  @apply font-serif antialiased flex flex-col bg-stone-100 dark:bg-stone-900 text-black/50 dark:text-white/75;
-  font-family: "Noto Serif SC", "Source Han Serif CN", "Source Han Serif SC", "Songti SC", serif;
+  @apply antialiased flex flex-col bg-stone-100 dark:bg-stone-900 text-black/50 dark:text-white/75;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 header { @apply fixed top-0 left-0 right-0 z-50 py-5 bg-stone-100/75 dark:bg-stone-900/25 backdrop-blur-sm saturate-200; }
 main { @apply flex-1 py-32; }
 footer { @apply py-5 text-sm; }
 
-/* 2. 核心：文章页对齐标准 */
+/* ----------------------------------------------------------------
+   3. 文章页对齐标准
+---------------------------------------------------------------- */
 article {
   @apply max-w-full prose dark:prose-invert prose-img:mx-auto prose-img:my-auto;
-  font-family: "Noto Serif SC", serif !important;
   @apply prose-headings:font-semibold prose-headings:text-black prose-headings:dark:text-white;
   text-align: justify;
   text-justify: inter-character;
   line-height: 1.8;
 }
 
-/* 强制全站文字元素在 iOS 上使用宋体 */
-article p, article h1, article h2, article h3, article h4, article h5, article h6, 
-article li, article blockquote, .description, .description p {
-  font-family: "Noto Serif SC", serif !important;
+/* 超链接：去掉下划线以外的所有干扰 */
+article a { 
+  @apply text-current underline underline-offset-4 decoration-black/20 dark:decoration-white/30 transition-all duration-300; 
+}
+article a:hover { 
+  @apply text-black dark:text-white decoration-black/60 dark:decoration-white/60; 
 }
 
-/* 链接与图片样式 */
-article a { @apply text-current underline underline-offset-4 decoration-black/20 dark:decoration-white/30 transition-all duration-300; }
-article a:hover { @apply text-black dark:text-white decoration-black/60 dark:decoration-white/60; }
-article img, .instant-image-wrapper img { @apply rounded-none border-none shadow-none transition-all duration-300; }
-article img:hover, .instant-image-wrapper:hover img { @apply brightness-105 dark:brightness-110; }
+/* 图片：彻底直角、无边框 */
+article img, .instant-image-wrapper img { 
+  @apply rounded-none border-none shadow-none transition-all duration-300; 
+}
+article img:hover, .instant-image-wrapper:hover img { 
+  @apply brightness-105 dark:brightness-110; 
+}
 
-code, pre { font-family: "JetBrains Mono", monospace !important; }
-
-/* 3. 容器与静态化 */
-.mx-auto.max-w-screen-sm { @apply px-5; } /* 回归标准边距 */
+/* ----------------------------------------------------------------
+   4. 容器、静态化与间距
+---------------------------------------------------------------- */
+.mx-auto.max-w-screen-sm { @apply px-5; }
 
 .animate { opacity: 1 !important; transform: none !important; transition: none !important; }
 
 html #back-to-top { @apply opacity-0 pointer-events-none; }
 html.scrolled #back-to-top { @apply opacity-100 pointer-events-auto; }
 
-/* 4. 刹那 (Instants) 样式 */
+/* 刹那 (Instants) 样式 */
 .instant-image-wrapper { @apply relative overflow-hidden rounded-none bg-zinc-200 dark:bg-zinc-800; }
 .instant-image-wrapper img { @apply w-full h-auto block; }
 
-/* 5. 滚动条 */
+/* 滚动条 */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { @apply bg-transparent; }
 ::-webkit-scrollbar-thumb { @apply bg-stone-300 dark:bg-stone-700 rounded-full; }

@@ -19,8 +19,11 @@ const { title, description } = Astro.props;
 <html lang="zh-CN">
   <head>
     <Head title={`${title} | ${SITE.NAME}`} description={description} />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
-    <ClientRouter />
+    
+    <!-- 引入 霞鹜文楷：使用 elemecdn 镜像，这是国内目前最稳定的源 -->
+    <link rel="stylesheet" href="https://npm.elemecdn.com/lxgw-wenkai-screen-webfont@1.1.0/style.css" />
+    
+    <ClientRouter fallback="swap" />
   </head>
   <body class="bg-stone-100 dark:bg-stone-900 transition-colors duration-300">
     <Header />
