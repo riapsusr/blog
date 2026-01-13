@@ -2,6 +2,7 @@
 import Container from "@components/Container.astro";
 import { SITE } from "@consts";
 import BackToTop from "@components/BackToTop.astro";
+const currentYear = new Date().getFullYear();
 ---
 
 <footer class="animate">
@@ -13,7 +14,7 @@ import BackToTop from "@components/BackToTop.astro";
     </div>
     <div class="flex justify-between items-center">
       <div>
-        &copy; 2025 {`|`} {SITE.NAME}
+        &copy; 2025 - {currentYear} {`|`} {SITE.NAME}
       </div>
 
       <!--
