@@ -52,7 +52,7 @@ header {
 }
 
 main {
-  @apply flex-1 py-32;
+  @apply flex-1 pt-32 pb-10; 
 }
 
 footer {
@@ -111,14 +111,6 @@ article img:hover,
   opacity: 1 !important;
   transform: none !important;
   transition: none !important;
-}
-
-html #back-to-top {
-  @apply opacity-0 pointer-events-none;
-}
-
-html.scrolled #back-to-top {
-  @apply opacity-100 pointer-events-auto;
 }
 
 /* 刹那 (Instants) 样式 */
