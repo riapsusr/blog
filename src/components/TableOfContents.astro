@@ -155,56 +155,24 @@ const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
         headings.forEach((heading) => observer.observe(heading));
 
         // 更新激活状态
-        function updateActiveLink(activeId: string | null) {
-            // 桌面端
-            tocLinks.forEach((link) => {
-                const href = link.getAttribute("href");
-                const isActive = href === `#${activeId}`;
+        function updateActiveLink(activeId) {
+            const updateLinks = (links) => {
+                links.forEach((link) => {
+                    const href = link.getAttribute("href");
+                    const isActive = href === `#${activeId}`;
 
-                if (isActive) {
-                    link.classList.remove(
-                        "text-stone-400",
-                        "dark:text-stone-500",
-                    );
-                    link.classList.add(
-                        "text-black",
-                        "dark:text-white",
-                        "font-semibold",
-                    );
-                } else {
-                    link.classList.add("text-stone-400", "dark:text-stone-500");
-                    link.classList.remove(
-                        "text-black",
-                        "dark:text-white",
-                        "font-semibold",
-                    );
-                }
-            });
+                    if (isActive) {
+                        link.classList.remove("text-stone-400", "dark:text-stone-500");
+                        link.classList.add("text-black", "dark:text-white", "font-semibold");
+                    } else {
+                        link.classList.add("text-stone-400", "dark:text-stone-500");
+                        link.classList.remove("text-black", "dark:text-white", "font-semibold");
+                    }
+                });
+            };
 
-            // 移动端
-            tocLinksMobile.forEach((link) => {
-                const href = link.getAttribute("href");
-                const isActive = href === `#${activeId}`;
-
-                if (isActive) {
-                    link.classList.remove(
-                        "text-stone-400",
-                        "dark:text-stone-500",
-                    );
-                    link.classList.add(
-                        "text-black",
-                        "dark:text-white",
-                        "font-semibold",
-                    );
-                } else {
-                    link.classList.add("text-stone-400", "dark:text-stone-500");
-                    link.classList.remove(
-                        "text-black",
-                        "dark:text-white",
-                        "font-semibold",
-                    );
-                }
-            });
+            updateLinks(tocLinks);
+            updateLinks(tocLinksMobile);
         }
 
         // 移动端抽屉逻辑
@@ -233,10 +201,31 @@ const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
         closeBtn?.addEventListener("click", closeDrawer);
         overlay?.addEventListener("click", closeDrawer);
 
-        // 点击目录链接后关闭抽屉
+        // --- 核心修复部分 ---
         tocLinksMobile.forEach((link) => {
-            link.addEventListener("click", () => {
-                setTimeout(closeDrawer, 100);
+            link.addEventListener("click", (e) => {
+                // 1. 阻止默认跳转（防止因 overflow:hidden 导致跳转失败）
+                e.preventDefault();
+                
+                // 2. 先关闭抽屉，恢复页面滚动能力
+                closeDrawer();
+
+                const href = link.getAttribute("href");
+                // 去掉 # 号拿到 id
+                const targetId = href ? href.substring(1) : null; 
+                const target = targetId ? document.getElementById(targetId) : null;
+
+                if (target) {
+                    // 3. 稍微延迟，等待 body 滚动锁定解除后再滚动
+                    setTimeout(() => {
+                        target.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start"
+                        });
+                        // 可选：静默更新 URL
+                        history.pushState(null, null, href);
+                    }, 50);
+                }
             });
         });
     }
