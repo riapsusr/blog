@@ -155,9 +155,10 @@ const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
         headings.forEach((heading) => observer.observe(heading));
 
         // 更新激活状态
-        function updateActiveLink(activeId) {
-            const updateLinks = (links) => {
-                links.forEach((link) => {
+        // 修复：添加类型注解 :any
+        function updateActiveLink(activeId: any) {
+            const updateLinks = (links: any) => {
+                links.forEach((link: any) => {
                     const href = link.getAttribute("href");
                     const isActive = href === `#${activeId}`;
 
@@ -223,7 +224,10 @@ const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
                             block: "start"
                         });
                         // 可选：静默更新 URL
-                        history.pushState(null, null, href);
+                        // 修复：将第二个参数 null 改为 "" (空字符串)
+                        if (href) {
+                            history.pushState(null, "", href);
+                        }
                     }, 50);
                 }
             });
