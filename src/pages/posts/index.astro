@@ -21,7 +21,7 @@ const categories = Object.keys(categoryCounts).sort(
     (a, b) => categoryCounts[b] - categoryCounts[a]
 );
 
-// 3. 按年份分组 (注意：这里我们对"所有"文章进行分组，筛选交给前端 JS)
+// 3. 按年份分组
 type Acc = { [year: string]: CollectionEntry<"posts">[] };
 const postsByYear = allPosts.reduce((acc: Acc, post) => {
   const year = post.data.date.getFullYear().toString();
@@ -41,7 +41,7 @@ const years = Object.keys(postsByYear).sort(
       <div class="flex flex-col gap-4">
         <h1 class="font-semibold text-black dark:text-white text-xl">文章</h1>
         
-        {/* 分类筛选按钮组 */}
+        {/* 分类筛选按钮组 - 关键ID: category-filter */}
         <div id="category-filter" class="flex flex-wrap gap-2 text-sm select-none">
             {/* "全部" 按钮 */}
             <a
@@ -74,7 +74,6 @@ const years = Object.keys(postsByYear).sort(
                 </div>
                 <ul class="flex flex-col gap-0">
                   {postsByYear[year].map((post) => (
-                    // 关键点：添加 data-category 属性供 JS 筛选
                     <li class="post-item" data-category={post.data.category}>
                       <ArrowCard entry={post} />
                     </li>
@@ -85,7 +84,7 @@ const years = Object.keys(postsByYear).sort(
         }
       </div>
       
-      {/* 当筛选结果为空时显示的提示 */}
+      {/* 空状态提示 */}
       <div id="empty-state" class="hidden text-stone-500 py-10 text-center">
         该分类下暂无文章
       </div>
@@ -96,11 +95,18 @@ const years = Object.keys(postsByYear).sort(
 
 <script>
     function filterPosts() {
+        // [关键修复] 安全检查：
+        // 只有当页面存在 id="category-filter" 时才执行逻辑
+        // 如果当前是在 instants 页面，这里会获取到 null，函数直接返回，不再污染其他页面的 DOM
+        const filterContainer = document.getElementById('category-filter');
+        if (!filterContainer) return;
+
         const params = new URLSearchParams(window.location.search);
         const currentCategory = params.get("category");
         
-        // 1. 处理按钮样式
-        const buttons = document.querySelectorAll('.filter-btn');
+        // 1. 处理按钮样式 (限定在 filterContainer 内查找，更安全)
+        const buttons = filterContainer.querySelectorAll('.filter-btn');
+        
         buttons.forEach(btn => {
             const btnCat = btn.getAttribute('data-cat');
             // 判断逻辑：如果 URL 没参数且按钮是 all，或者参数与按钮匹配
@@ -123,7 +129,6 @@ const years = Object.keys(postsByYear).sort(
 
         posts.forEach(post => {
             const postCat = post.getAttribute('data-category');
-            // 如果没有选分类，或者分类匹配
             if (!currentCategory || postCat === currentCategory) {
                 post.classList.remove('hidden');
                 hasVisiblePosts = true;
@@ -132,7 +137,7 @@ const years = Object.keys(postsByYear).sort(
             }
         });
 
-        // 3. 处理年份标题 (如果某年下的所有文章都隐藏了，该年份也隐藏)
+        // 3. 处理年份标题
         const yearSections = document.querySelectorAll('.year-section');
         yearSections.forEach(section => {
             const visiblePostsInYear = section.querySelectorAll('.post-item:not(.hidden)');
