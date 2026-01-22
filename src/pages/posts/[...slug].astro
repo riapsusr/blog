@@ -3,7 +3,6 @@ import { type CollectionEntry, getCollection, render } from "astro:content";
 import PageLayout from "@layouts/PageLayout.astro";
 import Container from "@components/Container.astro";
 import FormattedDate from "@components/FormattedDate.astro";
-import BackToPrev from "@components/BackToPrev.astro";
 import TableOfContents from "@components/TableOfContents.astro";
 
 export async function getStaticPaths() {
@@ -22,10 +21,16 @@ const { Content, headings } = await render(post);
 
 <PageLayout title={post.data.title} description={post.data.description}>
   <Container>
-    <BackToPrev href="/posts">返回文章列表</BackToPrev>
     <div class="space-y-1 my-10">
-      <div class="flex items-center gap-1.5 text-sm">
+      <div class="flex items-center gap-2 text-sm text-stone-500 dark:text-stone-400">
         <FormattedDate date={post.data.date} />
+        <span>&bull;</span>
+        <a 
+            href={`/posts?category=${post.data.category}`}
+            class="hover:text-black dark:hover:text-white underline underline-offset-2 transition-colors"
+        >
+            {post.data.category}
+        </a>
       </div>
       <h1 class="text-2xl font-semibold text-black dark:text-white">
         {post.data.title}

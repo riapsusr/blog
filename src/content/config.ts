@@ -8,12 +8,14 @@ const posts = defineCollection({
     description: z.string(),
     date: z.coerce.date(),
     draft: z.boolean().optional(),
+    // 新增：必填的分类字段
+    category: z.string(), 
   }),
 });
 
-// 刹那集：处理摄影和瞬间记录
+// 刹那集保持不变
 const instants = defineCollection({
-  type: "content", // 显式声明为内容集
+  type: "content",
   schema: ({ image }) => z.object({
     date: z.coerce.date(),
     location: z.string(),
