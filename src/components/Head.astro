@@ -45,8 +45,6 @@ const { title, description, image = "/nano.png" } = Astro.props;
     if (backToTop) {
       backToTop.onclick = (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "auto" }); };
     }
-    const backToPrev = document.getElementById("back-to-prev");
-    if (backToPrev) { backToPrev.onclick = () => window.history.back(); }
 
     const setupBtn = (id, theme) => {
       const btn = document.getElementById(id);
