@@ -1,0 +1,247 @@
+---
+export interface Props {
+    headings: { depth: number; slug: string; text: string }[];
+}
+
+const { headings } = Astro.props;
+
+// 只保留 h2 和 h3
+const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+---
+
+{
+    tocItems.length > 0 && (
+        <>
+            {/* 桌面端：右侧固定目录 */}
+            <nav
+                id="toc-desktop"
+                class="hidden xl:block fixed right-[calc((100vw-640px)/2-220px)] top-32 w-48 max-h-[calc(100vh-160px)] overflow-y-auto"
+                aria-label="目录"
+            >
+                <div class="text-xs font-semibold text-stone-400 dark:text-stone-500 mb-3 uppercase tracking-wider">
+                    目录
+                </div>
+                <ul class="space-y-2 text-sm">
+                    {tocItems.map((item) => (
+                        <li
+                            class:list={[
+                                "toc-item transition-all duration-200",
+                                item.depth === 3 && "pl-3",
+                            ]}
+                            data-slug={item.slug}
+                        >
+                            <a
+                                href={`#${item.slug}`}
+                                class="toc-link block text-stone-400 dark:text-stone-500 hover:text-stone-700 dark:hover:text-stone-300 transition-colors duration-200 leading-relaxed"
+                            >
+                                {item.text}
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            </nav>
+
+            {/* 移动端：底部悬浮按钮 + 抽屉 */}
+            <div class="xl:hidden">
+                {/* 悬浮按钮 */}
+                <button
+                    id="toc-mobile-btn"
+                    class="fixed bottom-20 right-5 z-40 w-10 h-10 bg-stone-200 dark:bg-stone-800 rounded-full shadow-lg flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors duration-200"
+                    aria-label="打开目录"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-5 h-5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <line x1="3" y1="12" x2="15" y2="12" />
+                        <line x1="3" y1="18" x2="18" y2="18" />
+                    </svg>
+                </button>
+
+                {/* 遮罩层 */}
+                <div
+                    id="toc-overlay"
+                    class="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"
+                />
+
+                {/* 抽屉 */}
+                <nav
+                    id="toc-drawer"
+                    class="fixed bottom-0 left-0 right-0 z-50 bg-stone-100 dark:bg-stone-900 rounded-t-2xl shadow-2xl transform translate-y-full transition-transform duration-300 ease-out max-h-[60vh] overflow-hidden"
+                    aria-label="目录"
+                >
+                    <div class="flex items-center justify-between px-5 py-4 border-b border-stone-200 dark:border-stone-800">
+                        <span class="text-sm font-semibold text-stone-600 dark:text-stone-300">
+                            目录
+                        </span>
+                        <button
+                            id="toc-close-btn"
+                            class="w-8 h-8 flex items-center justify-center text-stone-500 hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
+                            aria-label="关闭目录"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-5 h-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </button>
+                    </div>
+                    <ul class="p-5 space-y-3 overflow-y-auto max-h-[calc(60vh-60px)]">
+                        {tocItems.map((item) => (
+                            <li
+                                class:list={[
+                                    "toc-item-mobile transition-all duration-200",
+                                    item.depth === 3 && "pl-4",
+                                ]}
+                                data-slug={item.slug}
+                            >
+                                <a
+                                    href={`#${item.slug}`}
+                                    class="toc-link-mobile block text-stone-400 dark:text-stone-500 hover:text-stone-700 dark:hover:text-stone-300 transition-colors duration-200 py-1"
+                                >
+                                    {item.text}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
+            </div>
+        </>
+    )
+}
+
+<script>
+    function setupTOC() {
+        // 获取所有标题元素
+        const headings = document.querySelectorAll(
+            "article h2[id], article h3[id]",
+        );
+        const tocLinks = document.querySelectorAll(".toc-link");
+        const tocLinksMobile = document.querySelectorAll(".toc-link-mobile");
+
+        if (headings.length === 0) return;
+
+        // 使用 IntersectionObserver 监听标题
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute("id");
+                        updateActiveLink(id);
+                    }
+                });
+            },
+            {
+                rootMargin: "-80px 0px -70% 0px",
+                threshold: 0,
+            },
+        );
+
+        headings.forEach((heading) => observer.observe(heading));
+
+        // 更新激活状态
+        function updateActiveLink(activeId: string | null) {
+            // 桌面端
+            tocLinks.forEach((link) => {
+                const href = link.getAttribute("href");
+                const isActive = href === `#${activeId}`;
+
+                if (isActive) {
+                    link.classList.remove(
+                        "text-stone-400",
+                        "dark:text-stone-500",
+                    );
+                    link.classList.add(
+                        "text-black",
+                        "dark:text-white",
+                        "font-semibold",
+                    );
+                } else {
+                    link.classList.add("text-stone-400", "dark:text-stone-500");
+                    link.classList.remove(
+                        "text-black",
+                        "dark:text-white",
+                        "font-semibold",
+                    );
+                }
+            });
+
+            // 移动端
+            tocLinksMobile.forEach((link) => {
+                const href = link.getAttribute("href");
+                const isActive = href === `#${activeId}`;
+
+                if (isActive) {
+                    link.classList.remove(
+                        "text-stone-400",
+                        "dark:text-stone-500",
+                    );
+                    link.classList.add(
+                        "text-black",
+                        "dark:text-white",
+                        "font-semibold",
+                    );
+                } else {
+                    link.classList.add("text-stone-400", "dark:text-stone-500");
+                    link.classList.remove(
+                        "text-black",
+                        "dark:text-white",
+                        "font-semibold",
+                    );
+                }
+            });
+        }
+
+        // 移动端抽屉逻辑
+        const mobileBtn = document.getElementById("toc-mobile-btn");
+        const drawer = document.getElementById("toc-drawer");
+        const overlay = document.getElementById("toc-overlay");
+        const closeBtn = document.getElementById("toc-close-btn");
+
+        function openDrawer() {
+            drawer?.classList.remove("translate-y-full");
+            drawer?.classList.add("translate-y-0");
+            overlay?.classList.remove("opacity-0", "pointer-events-none");
+            overlay?.classList.add("opacity-100", "pointer-events-auto");
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeDrawer() {
+            drawer?.classList.add("translate-y-full");
+            drawer?.classList.remove("translate-y-0");
+            overlay?.classList.add("opacity-0", "pointer-events-none");
+            overlay?.classList.remove("opacity-100", "pointer-events-auto");
+            document.body.style.overflow = "";
+        }
+
+        mobileBtn?.addEventListener("click", openDrawer);
+        closeBtn?.addEventListener("click", closeDrawer);
+        overlay?.addEventListener("click", closeDrawer);
+
+        // 点击目录链接后关闭抽屉
+        tocLinksMobile.forEach((link) => {
+            link.addEventListener("click", () => {
+                setTimeout(closeDrawer, 100);
+            });
+        });
+    }
+
+    // 初始化
+    setupTOC();
+    document.addEventListener("astro:after-swap", setupTOC);
+</script>

@@ -6,17 +6,19 @@ import ArrowCard from "@components/ArrowCard.astro";
 import { POSTS } from "@consts";
 
 const data = (await getCollection("posts"))
-  .filter(post => !post.data.draft)
+  .filter((post) => !post.data.draft)
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-type Acc = { [year: string]: CollectionEntry<"posts">[]; }
+type Acc = { [year: string]: CollectionEntry<"posts">[] };
 const postsByYear = data.reduce((acc: Acc, post) => {
   const year = post.data.date.getFullYear().toString();
   if (!acc[year]) acc[year] = [];
   acc[year].push(post);
   return acc;
 }, {});
-const years = Object.keys(postsByYear).sort((a, b) => parseInt(b) - parseInt(a));
+const years = Object.keys(postsByYear).sort(
+  (a, b) => parseInt(b) - parseInt(a),
+);
 ---
 
 <PageLayout title={POSTS.TITLE} description={POSTS.DESCRIPTION}>
@@ -24,14 +26,22 @@ const years = Object.keys(postsByYear).sort((a, b) => parseInt(b) - parseInt(a))
     <div class="space-y-10">
       <div class="font-semibold text-black dark:text-white">文章</div>
       <div class="space-y-12">
-        {years.map(year => (
-          <section class="space-y-4">
-            <div class="font-semibold text-black dark:text-white pt-10">{year}</div>
-            <ul class="flex flex-col gap-0">
-              {postsByYear[year].map((post) => <li><ArrowCard entry={post}/></li>)}
-            </ul>
-          </section>
-        ))}
+        {
+          years.map((year) => (
+            <section class="space-y-4">
+              <div class="font-semibold text-black dark:text-white pt-10">
+                {year}
+              </div>
+              <ul class="flex flex-col gap-0">
+                {postsByYear[year].map((post) => (
+                  <li>
+                    <ArrowCard entry={post} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
       </div>
     </div>
   </Container>

@@ -17,7 +17,7 @@ const instants = defineCollection({
   schema: ({ image }) => z.object({
     date: z.coerce.date(),
     location: z.string(),
-    images: z.array(image()), 
+    images: z.array(image()),
   }),
 });
 
