@@ -73,9 +73,15 @@ const years = Object.keys(postsByYear).sort(
                   {year}
                 </div>
                 <ul class="flex flex-col gap-0">
-                  {postsByYear[year].map((post) => (
+                  {postsByYear[year].map((post, index) => (
                     <li class="post-item" data-category={post.data.category}>
-                      <ArrowCard entry={post} />
+                      <ArrowCard 
+                        entry={post} 
+                        class:list={[
+                          index === 0 && "rounded-t-lg",
+                          index === postsByYear[year].length - 1 && "rounded-b-lg border-b-0"
+                        ]}
+                      />
                     </li>
                   ))}
                 </ul>
@@ -143,6 +149,24 @@ const years = Object.keys(postsByYear).sort(
             const visiblePostsInYear = section.querySelectorAll('.post-item:not(.hidden)');
             if (visiblePostsInYear.length > 0) {
                 section.classList.remove('hidden');
+                
+                // 3.1 动态更新圆角样式
+                const visibleLinks = section.querySelectorAll('.post-item:not(.hidden) > a');
+                visibleLinks.forEach((link, index) => {
+                    const isFirst = index === 0;
+                    const isLast = index === visibleLinks.length - 1;
+                    
+                    // 重置样式
+                    link.classList.remove('rounded-t-lg', 'rounded-b-lg', 'border-b-0');
+                    
+                    if (isFirst) {
+                        link.classList.add('rounded-t-lg');
+                    }
+                    if (isLast) {
+                        link.classList.add('rounded-b-lg', 'border-b-0');
+                    }
+                });
+
             } else {
                 section.classList.add('hidden');
             }

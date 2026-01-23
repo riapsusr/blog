@@ -1,7 +1,10 @@
 ---
 import type { CollectionEntry } from "astro:content";
-type Props = { entry: CollectionEntry<"posts">; }
-const { entry } = Astro.props;
+type Props = { 
+  entry: CollectionEntry<"posts">;
+  class?: string;
+}
+const { entry, class: className } = Astro.props;
 const month = String(entry.data.date.getMonth() + 1).padStart(2, '0');
 const day = String(entry.data.date.getDate()).padStart(2, '0');
 const formattedDate = `${month}-${day}`;
@@ -10,7 +13,10 @@ const href = `/${entry.collection}/${entry.id.replace(/\.[^/.]+$/, "")}`;
 
 <a 
   href={href}
-  class="relative group flex flex-nowrap py-4 px-3 -mx-3 items-center gap-4 transition-all duration-300 border-b border-black/5 dark:border-white/5 hover:bg-black/[0.08] dark:hover:bg-white/[0.1] -mb-[1px] rounded-none shadow-none"
+  class:list={[
+    "relative group flex flex-nowrap py-4 px-3 -mx-3 items-center gap-4 transition-all duration-300 border-b border-black/5 dark:border-white/5 hover:bg-black/[0.08] dark:hover:bg-white/[0.1] -mb-[1px] shadow-none",
+    className
+  ]}
 >
   <!-- 移除所有 font-sans 确保字体继承 -->
   <div class="text-sm tabular-nums opacity-50 flex-shrink-0 font-mono">

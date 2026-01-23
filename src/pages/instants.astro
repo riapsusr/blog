@@ -1,14 +1,14 @@
 ---
 import { getCollection } from "astro:content";
-import { Image } from "astro:assets";
 import PageLayout from "@layouts/PageLayout.astro";
 import Container from "@components/Container.astro";
+import InstantCard from "@components/InstantCard.astro";
 import { INSTANTS } from "@consts";
 
 const data = (await getCollection("instants")).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime()
 );
-const formatDate = (date: Date) => date.toISOString().split('T')[0];
+// const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
 const instantsByYear = data.reduce((acc, item) => {
   const year = item.data.date.getFullYear().toString();
@@ -55,23 +55,14 @@ const years = Object.keys(instantsByYear).sort((a, b) => parseInt(b) - parseInt(
             {/* 修复3：将 pt-10 改为 pt-2，并添加 text-lg。这是导致间距过大的主要原因 */}
             <div class="font-semibold text-black dark:text-white pt-2 text-lg">{year}</div>
             <div class="space-y-16">
-              {instantsByYear[year].map(async (item) => {
-                const { Content } = await item.render();
-                return (
-                  <article class="space-y-4">
-                    {item.data.images[0] && (
-                      <div class="instant-image-wrapper">
-                        <Image src={item.data.images[0]} alt={item.data.location} width={1200} format="webp" class="w-full h-auto object-cover" />
-                      </div>
-                    )}
-                    <div class="text-[13px] text-zinc-400 flex items-center gap-2">
-                      <time>{formatDate(item.data.date)}</time><span>·</span><span>{item.data.location}</span>
-                    </div>
-                    <div class="description text-sm"><Content /></div>
+              {instantsByYear[year].map((item, index) => (
+                <div class="instant-item">
+                  <InstantCard entry={item} />
+                  {index !== instantsByYear[year].length - 1 && (
                     <div class="pt-8 border-b border-black/5 dark:border-white/5"></div>
-                  </article>
-                )
-              })}
+                  )}
+                </div>
+              ))}
             </div>
           </section>
         ))}

@@ -66,6 +66,9 @@ const activeClass = (path: string) =>
       document.head.removeChild(css);
     });
   }
+
   setupThemeToggle();
-  document.addEventListener("astro:after-swap", setupThemeToggle);
+  document.addEventListener("astro:after-swap", () => {
+    setupThemeToggle();
+  });
 </script>
