@@ -83,25 +83,18 @@ article h6 {
 /* 二级标题装饰 */
 article h2 {
   @apply relative pl-4 !important;
-  @apply mt-16 mb-8 !important;
-  /* 增加上下间距，上方留白更多 */
+  font-size: 1.35rem !important;
+  /* ~21.6px */
+  margin-top: 2.5rem !important;
+  margin-bottom: 1.25rem !important;
   line-height: 1.4 !important;
-  /* 紧凑行高 */
 }
 
-/* 移动端文章标题调整 */
-@media (max-width: 768px) {
-  article h2 {
-    font-size: 1.35rem !important; /* ~21.6px */
-    margin-top: 2.5rem !important;
-    margin-bottom: 1.25rem !important;
-  }
-  
-  article h3 {
-    font-size: 1.15rem !important; /* ~18.4px */
-    margin-top: 2rem !important;
-    margin-bottom: 1rem !important;
-  }
+article h3 {
+  font-size: 1.15rem !important;
+  /* ~18.4px */
+  margin-top: 2rem !important;
+  margin-bottom: 1rem !important;
 }
 
 article h2::before {
