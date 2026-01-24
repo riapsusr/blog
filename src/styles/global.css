@@ -52,7 +52,7 @@ header {
 }
 
 main {
-  @apply flex-1 pt-32 pb-10; 
+  @apply flex-1 pt-32 pb-10;
 }
 
 footer {
@@ -78,6 +78,21 @@ article h4,
 article h5,
 article h6 {
   scroll-margin-top: 6rem;
+}
+
+/* 二级标题装饰 */
+article h2 {
+  @apply relative pl-4 !important;
+  @apply mt-16 mb-8 !important;
+  /* 增加上下间距，上方留白更多 */
+  line-height: 1.4 !important;
+  /* 紧凑行高 */
+}
+
+article h2::before {
+  content: "";
+  @apply absolute left-0 top-[0.25em] bottom-[0.25em] w-1 bg-red-500/80 dark:bg-red-500/80 rounded-sm;
+  /* 降低不透明度 */
 }
 
 /* 超链接：去掉下划线以外的所有干扰 */

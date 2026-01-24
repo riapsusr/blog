@@ -21,7 +21,10 @@ const { Content, headings } = await render(post);
 
 <PageLayout title={post.data.title} description={post.data.description}>
   <Container>
-    <div class="space-y-1 my-10">
+    <div class="space-y-4 my-16">
+      <h1 class="text-4xl font-semibold text-black dark:text-white leading-tight">
+        {post.data.title}
+      </h1>
       <div class="flex items-center gap-2 text-sm text-stone-500 dark:text-stone-400">
         <FormattedDate date={post.data.date} />
         <span>&bull;</span>
@@ -32,9 +35,6 @@ const { Content, headings } = await render(post);
             {post.data.category}
         </a>
       </div>
-      <h1 class="text-2xl font-semibold text-black dark:text-white">
-        {post.data.title}
-      </h1>
     </div>
     <article data-pagefind-body>
       <Content />
