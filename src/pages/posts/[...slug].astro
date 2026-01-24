@@ -36,7 +36,9 @@ const { Content, headings } = await render(post);
         {post.data.title}
       </h1>
     </div>
-    <article><Content /></article>
+    <article data-pagefind-body>
+      <Content />
+    </article>
   </Container>
   <TableOfContents headings={headings} />
 </PageLayout>
