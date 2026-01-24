@@ -21,24 +21,31 @@ const { Content, headings } = await render(post);
 
 <PageLayout title={post.data.title} description={post.data.description}>
   <Container>
-    <div class="space-y-4 my-16">
-      <h1 class="text-4xl font-semibold text-black dark:text-white leading-tight">
-        {post.data.title}
-      </h1>
-      <div class="flex items-center gap-2 text-sm text-stone-500 dark:text-stone-400">
-        <FormattedDate date={post.data.date} />
-        <span>&bull;</span>
-        <a 
-            href={`/posts?category=${post.data.category}`}
-            class="hover:text-black dark:hover:text-white underline underline-offset-2 transition-colors"
-        >
-            {post.data.category}
-        </a>
+    <div class="relative">
+      <div class="space-y-4 mt-8 mb-12">
+        <h1 class="text-4xl font-semibold text-black dark:text-white leading-tight">
+          {post.data.title}
+        </h1>
+        <div class="flex items-center gap-2 text-sm text-stone-500 dark:text-stone-400">
+          <FormattedDate date={post.data.date} />
+          <span>&bull;</span>
+          <a 
+              href={`/posts?category=${post.data.category}`}
+              class="hover:text-black dark:hover:text-white underline underline-offset-2 transition-colors"
+          >
+              {post.data.category}
+          </a>
+        </div>
+      </div>
+      <article data-pagefind-body>
+        <Content />
+      </article>
+      <div class="hidden xl:block absolute left-full top-0 h-full ml-12">
+         <TableOfContents headings={headings} />
       </div>
     </div>
-    <article data-pagefind-body>
-      <Content />
-    </article>
   </Container>
-  <TableOfContents headings={headings} />
+  <div class="xl:hidden">
+    <TableOfContents headings={headings} />
+  </div>
 </PageLayout>

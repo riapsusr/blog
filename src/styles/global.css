@@ -52,7 +52,7 @@ header {
 }
 
 main {
-  @apply flex-1 pt-32 pb-10;
+  @apply flex-1 pt-24 pb-10;
 }
 
 footer {

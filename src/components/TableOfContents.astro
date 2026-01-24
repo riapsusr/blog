@@ -15,7 +15,7 @@ const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
             {/* 桌面端：右侧固定目录 */}
             <nav
                 id="toc-desktop"
-                class="hidden xl:block fixed right-[calc((100vw-640px)/2-220px)] top-32 w-48 max-h-[calc(100vh-160px)] overflow-y-auto border border-black/10 dark:border-white/10 rounded-lg p-4"
+                class="hidden xl:block sticky top-32 w-48 max-h-[calc(100vh-8rem)] overflow-y-auto border border-black/10 dark:border-white/10 rounded-lg p-4"
                 aria-label="目录"
             >
                 <div class="text-xs font-semibold text-stone-400 dark:text-stone-500 mb-3 uppercase tracking-wider">
