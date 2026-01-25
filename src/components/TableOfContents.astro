@@ -42,11 +42,10 @@ const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
             </nav>
 
             {/* 移动端：底部悬浮按钮 + 抽屉 */}
-            <div class="xl:hidden">
+            <div class="xl:hidden toc-mobile-container">
                 {/* 悬浮按钮 */}
                 <button
-                    id="toc-mobile-btn"
-                    class="fixed bottom-20 right-5 z-40 w-10 h-10 bg-stone-200 dark:bg-stone-800 rounded-full shadow-lg flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors duration-200"
+                    class="toc-mobile-btn fixed bottom-20 right-5 z-40 w-10 h-10 bg-stone-200 dark:bg-stone-800 rounded-full shadow-lg flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors duration-200"
                     aria-label="打开目录"
                 >
                     <svg
@@ -67,14 +66,12 @@ const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 
                 {/* 遮罩层 */}
                 <div
-                    id="toc-overlay"
-                    class="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"
+                    class="toc-overlay fixed inset-0 z-40 bg-black/30 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"
                 />
 
                 {/* 抽屉 */}
                 <nav
-                    id="toc-drawer"
-                    class="fixed bottom-0 left-0 right-0 z-50 bg-stone-100 dark:bg-stone-900 rounded-t-2xl shadow-2xl transform translate-y-full transition-transform duration-300 ease-out max-h-[60vh] overflow-hidden"
+                    class="toc-drawer fixed bottom-0 left-0 right-0 z-50 bg-stone-100 dark:bg-stone-900 rounded-t-2xl shadow-2xl transform translate-y-full transition-transform duration-300 ease-out max-h-[60vh] overflow-hidden"
                     aria-label="目录"
                 >
                     <div class="flex items-center justify-between px-5 py-4 border-b border-stone-200 dark:border-stone-800">
@@ -82,8 +79,7 @@ const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
                             目录
                         </span>
                         <button
-                            id="toc-close-btn"
-                            class="w-8 h-8 flex items-center justify-center text-stone-500 hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
+                            class="toc-close-btn w-8 h-8 flex items-center justify-center text-stone-500 hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
                             aria-label="关闭目录"
                         >
                             <svg
@@ -176,60 +172,68 @@ const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
             updateLinks(tocLinksMobile);
         }
 
-        // 移动端抽屉逻辑
-        const mobileBtn = document.getElementById("toc-mobile-btn");
-        const drawer = document.getElementById("toc-drawer");
-        const overlay = document.getElementById("toc-overlay");
-        const closeBtn = document.getElementById("toc-close-btn");
+        // 移动端抽屉逻辑 - 支持多实例
+        const mobileContainers = document.querySelectorAll(".toc-mobile-container");
+        
+        mobileContainers.forEach(container => {
+            const mobileBtn = container.querySelector(".toc-mobile-btn");
+            const drawer = container.querySelector(".toc-drawer");
+            const overlay = container.querySelector(".toc-overlay");
+            const closeBtn = container.querySelector(".toc-close-btn");
+            const links = container.querySelectorAll(".toc-link-mobile");
 
-        function openDrawer() {
-            drawer?.classList.remove("translate-y-full");
-            drawer?.classList.add("translate-y-0");
-            overlay?.classList.remove("opacity-0", "pointer-events-none");
-            overlay?.classList.add("opacity-100", "pointer-events-auto");
-            document.body.style.overflow = "hidden";
-        }
+            function openDrawer() {
+                drawer?.classList.remove("translate-y-full");
+                drawer?.classList.add("translate-y-0");
+                overlay?.classList.remove("opacity-0", "pointer-events-none");
+                overlay?.classList.add("opacity-100", "pointer-events-auto");
+                document.body.style.overflow = "hidden";
+            }
 
-        function closeDrawer() {
-            drawer?.classList.add("translate-y-full");
-            drawer?.classList.remove("translate-y-0");
-            overlay?.classList.add("opacity-0", "pointer-events-none");
-            overlay?.classList.remove("opacity-100", "pointer-events-auto");
-            document.body.style.overflow = "";
-        }
+            function closeDrawer() {
+                drawer?.classList.add("translate-y-full");
+                drawer?.classList.remove("translate-y-0");
+                overlay?.classList.add("opacity-0", "pointer-events-none");
+                overlay?.classList.remove("opacity-100", "pointer-events-auto");
+                document.body.style.overflow = "";
+            }
 
-        mobileBtn?.addEventListener("click", openDrawer);
-        closeBtn?.addEventListener("click", closeDrawer);
-        overlay?.addEventListener("click", closeDrawer);
+            mobileBtn?.addEventListener("click", (e) => {
+                e.stopPropagation();
+                openDrawer();
+            });
+            closeBtn?.addEventListener("click", closeDrawer);
+            overlay?.addEventListener("click", closeDrawer);
+            
+            // 将 closeDrawer 绑定到该实例的链接点击事件
+            links.forEach(link => {
+                link.addEventListener("click", (e) => {
+                    // 1. 阻止默认跳转（防止因 overflow:hidden 导致跳转失败）
+                    e.preventDefault();
+                    
+                    // 2. 先关闭抽屉，恢复页面滚动能力
+                    closeDrawer();
 
-        // --- 核心修复部分 ---
-        tocLinksMobile.forEach((link) => {
-            link.addEventListener("click", (e) => {
-                // 1. 阻止默认跳转（防止因 overflow:hidden 导致跳转失败）
-                e.preventDefault();
-                
-                // 2. 先关闭抽屉，恢复页面滚动能力
-                closeDrawer();
+                    const href = link.getAttribute("href");
+                    // 去掉 # 号拿到 id
+                    const targetId = href ? href.substring(1) : null; 
+                    const target = targetId ? document.getElementById(targetId) : null;
 
-                const href = link.getAttribute("href");
-                // 去掉 # 号拿到 id
-                const targetId = href ? href.substring(1) : null; 
-                const target = targetId ? document.getElementById(targetId) : null;
-
-                if (target) {
-                    // 3. 稍微延迟，等待 body 滚动锁定解除后再滚动
-                    setTimeout(() => {
-                        target.scrollIntoView({
-                            behavior: "smooth",
-                            block: "start"
-                        });
-                        // 可选：静默更新 URL
-                        // 修复：将第二个参数 null 改为 "" (空字符串)
-                        if (href) {
-                            history.pushState(null, "", href);
-                        }
-                    }, 50);
-                }
+                    if (target) {
+                        // 3. 稍微延迟，等待 body 滚动锁定解除后再滚动
+                        setTimeout(() => {
+                            target.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start"
+                            });
+                            // 可选：静默更新 URL
+                            // 修复：将第二个参数 null 改为 "" (空字符串)
+                            if (href) {
+                                history.pushState(null, "", href);
+                            }
+                        }, 50);
+                    }
+                });
             });
         });
     }
