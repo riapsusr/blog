@@ -22,6 +22,11 @@ export const INSTANTS: Metadata = {
   DESCRIPTION: "",
 };
 
+export const ABOUT: Metadata = {
+  TITLE: "关于",
+  DESCRIPTION: "关于我",
+};
+
 export const SOCIALS: Socials = [
   { 
     NAME: "Twitter",

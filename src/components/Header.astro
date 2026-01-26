@@ -39,6 +39,12 @@ const activeClass = (path: string) =>
             刹那
           </span>
         </Link>
+
+        <Link href="/about" underline={false}>
+          <span class:list={["px-2 py-1.5 rounded-none text-center block", activeClass("/about")]}>
+            关于
+          </span>
+        </Link>
       </nav>
     </div>
   </Container>
