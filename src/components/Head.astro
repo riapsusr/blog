@@ -1,6 +1,5 @@
 ---
 import "../styles/global.css";
-import { ClientRouter } from "astro:transitions";
 import { SITE } from "@consts";
 
 interface Props {
@@ -30,7 +29,6 @@ const { title, description, image = "/nano.png" } = Astro.props;
 <meta property="twitter:card" content="summary_large_image" />
 
 <link rel="alternate" type="application/rss+xml" title={SITE.NAME} href={new URL("rss.xml", Astro.site)} />
-<ClientRouter fallback="swap" />
 
 <script is:inline>
   function applyTheme() {
@@ -68,11 +66,11 @@ const { title, description, image = "/nano.png" } = Astro.props;
 
   applyTheme();
   document.addEventListener("DOMContentLoaded", init);
-  document.addEventListener("astro:after-swap", () => {
-    window.scrollTo(0, 0); 
-    if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
-    applyTheme();
-    init();
-  });
+  // document.addEventListener("astro:after-swap", () => {
+  //   // window.scrollTo(0, 0); 
+  //   // if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
+  //   applyTheme();
+  //   init();
+  // });
   window.addEventListener("scroll", onScroll, { passive: true });
 </script>

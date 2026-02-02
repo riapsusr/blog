@@ -227,9 +227,9 @@ const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
                                 block: "start"
                             });
                             // 可选：静默更新 URL
-                            // 修复：将第二个参数 null 改为 "" (空字符串)
+                            // 使用 replaceState 避免污染历史记录栈，解决 iOS 返回问题
                             if (href) {
-                                history.pushState(null, "", href);
+                                history.replaceState(null, "", href);
                             }
                         }, 50);
                     }
@@ -240,5 +240,5 @@ const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 
     // 初始化
     setupTOC();
-    document.addEventListener("astro:after-swap", setupTOC);
+    // document.addEventListener("astro:after-swap", setupTOC);
 </script>

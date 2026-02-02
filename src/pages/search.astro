@@ -23,6 +23,15 @@ import Container from "@components/Container.astro";
     const searchDiv = document.getElementById("search");
     // 如果元素存在且未被初始化（Pagefind 会在 div 内部创建结构，如果已经有内容说明可能已初始化，但最好先清空）
     if (searchDiv) {
+        if (typeof PagefindUI === "undefined") {
+            const warning = document.createElement("div");
+            warning.className = "text-center text-stone-500 py-10";
+            warning.innerHTML = "搜索功能仅在生产构建(Build)后可用<br>Dev 模式下无法预览搜索结果";
+            searchDiv.innerHTML = "";
+            searchDiv.appendChild(warning);
+            return;
+        }
+
         searchDiv.innerHTML = ""; // 清空旧内容，确保重新初始化
         new PagefindUI({ 
             element: "#search", 
@@ -45,10 +54,11 @@ import Container from "@components/Container.astro";
     }
   }
 
-  // 初始加载
-  document.addEventListener("DOMContentLoaded", initPagefind);
   // View Transitions 页面切换加载
-  document.addEventListener("astro:page-load", initPagefind);
+  // document.addEventListener("astro:page-load", initPagefind);
+  
+  // 普通页面加载
+  document.addEventListener("DOMContentLoaded", initPagefind);
 </script>
 
 <style is:global>
