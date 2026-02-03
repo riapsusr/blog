@@ -17,12 +17,11 @@ import Container from "@components/Container.astro";
 <script is:inline src="/pagefind/pagefind-ui.js"></script>
 
 <script>
-  declare const PagefindUI: any;
-
   function initPagefind() {
     const searchDiv = document.getElementById("search");
     // 如果元素存在且未被初始化（Pagefind 会在 div 内部创建结构，如果已经有内容说明可能已初始化，但最好先清空）
     if (searchDiv) {
+        const PagefindUI = window.PagefindUI;
         if (typeof PagefindUI === "undefined") {
             const warning = document.createElement("div");
             warning.className = "text-center text-stone-500 py-10";

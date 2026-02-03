@@ -1,5 +1,5 @@
 ---
-import { getCollection } from "astro:content";
+import { getCollection, type CollectionEntry } from "astro:content";
 import PageLayout from "@layouts/PageLayout.astro";
 import Container from "@components/Container.astro";
 import InstantCard from "@components/InstantCard.astro";
@@ -15,7 +15,7 @@ const instantsByYear = data.reduce((acc, item) => {
   if (!acc[year]) acc[year] = [];
   acc[year].push(item);
   return acc;
-}, {} as Record<string, any[]>);
+}, {} as Record<string, CollectionEntry<"instants">[]>);
 const years = Object.keys(instantsByYear).sort((a, b) => parseInt(b) - parseInt(a));
 ---
 

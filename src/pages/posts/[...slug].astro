@@ -30,7 +30,7 @@ const { Content, headings } = await render(post);
           <FormattedDate date={post.data.date} />
           <span>&bull;</span>
           <a 
-              href={`/posts?category=${post.data.category}`}
+              href={`/posts?category=${encodeURIComponent(post.data.category)}`}
               class="hover:text-black dark:hover:text-white underline underline-offset-2 transition-colors"
           >
               {post.data.category}
