@@ -1,6 +1,6 @@
 import rss from "@astrojs/rss";
 import { getCollection } from "astro:content";
-import { HOME } from "@consts";
+import { SITE, HOME } from "@consts";
 import sanitizeHtml from 'sanitize-html';
 import MarkdownIt from 'markdown-it';
 
@@ -17,8 +17,8 @@ export async function GET(context: Context) {
   const items = [...posts].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
   return rss({
-    title: HOME.TITLE,
-    description: HOME.DESCRIPTION,
+    title: `${SITE.NAME} - ${HOME.TITLE}`,
+    description: SITE.NAME,
     site: context.site,
     items: items.map((item) => ({
       title: item.data.title,

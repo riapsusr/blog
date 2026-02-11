@@ -16,7 +16,7 @@ import Container from "@components/Container.astro";
 <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
 <script is:inline src="/pagefind/pagefind-ui.js"></script>
 
-<script>
+<script is:inline>
   function initPagefind() {
     const searchDiv = document.getElementById("search");
     // 如果元素存在且未被初始化（Pagefind 会在 div 内部创建结构，如果已经有内容说明可能已初始化，但最好先清空）

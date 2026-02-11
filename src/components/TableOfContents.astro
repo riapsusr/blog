@@ -121,7 +121,7 @@ const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
     )
 }
 
-<script>
+<script is:inline>
     function setupTOC() {
         // 获取所有标题元素
         const headings = document.querySelectorAll(
@@ -151,7 +151,6 @@ const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
         headings.forEach((heading) => observer.observe(heading));
 
         // 更新激活状态
-        // 修复：添加类型注解 :any
         function updateActiveLink(activeId) {
             const updateLinks = (links) => {
                 links.forEach((link) => {
@@ -240,5 +239,4 @@ const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 
     // 初始化
     setupTOC();
-    // document.addEventListener("astro:after-swap", setupTOC);
 </script>

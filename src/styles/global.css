@@ -130,7 +130,7 @@ article img:hover,
   @apply px-5;
 }
 
-.animate {
+.no-animation {
   opacity: 1 !important;
   transform: none !important;
   transition: none !important;
@@ -138,7 +138,11 @@ article img:hover,
 
 /* 刹那 (Instants) 样式 */
 .instant-image-wrapper {
-  @apply relative overflow-hidden rounded-none bg-zinc-200 dark:bg-zinc-800;
+  @apply relative overflow-hidden rounded-none;
+}
+
+.instant-image-wrapper picture {
+  @apply block;
 }
 
 .instant-image-wrapper img {
