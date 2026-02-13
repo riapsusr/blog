@@ -9,12 +9,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        // 1. 将所有 sans 字体合并，霞鹜文楷放在第一位
-        // 2. 后面紧跟 defaultTheme.fontFamily.sans，它包含了所有的系统兜底字体
-        sans: ['"LXGW WenKai Screen"', ...defaultTheme.fontFamily.sans],
-        
-        // 如果你还想保留 Lora 作为衬线字体
-        serif: ["Lora", ...defaultTheme.fontFamily.serif],
+        // 使用 Tailwind 默认字体栈
+        sans: [...defaultTheme.fontFamily.sans],
+        serif: [...defaultTheme.fontFamily.serif],
       },
     },
   },
