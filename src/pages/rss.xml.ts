@@ -16,7 +16,7 @@ export async function GET(context: Context) {
 
   const items = [...posts].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
- return rss({
+  const rssResponse = await rss({
     title: `${SITE.NAME} - ${HOME.TITLE}`,
     description: SITE.NAME,
     site: context.site,
@@ -30,5 +30,13 @@ export async function GET(context: Context) {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img'])
       }),
     })),
+  });
+
+  const rssText = await rssResponse.text();
+
+  return new Response(rssText, {
+    headers: {
+      'Content-Type': 'application/xml; charset=utf-8',
+    },
   });
 }
