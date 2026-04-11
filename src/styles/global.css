@@ -113,13 +113,11 @@ article a:hover {
 }
 
 /* 图片：彻底直角、无边框 */
-article img,
-.instant-image-wrapper img {
+article img {
   @apply rounded-none border-none shadow-none transition-all duration-300;
 }
 
-article img:hover,
-.instant-image-wrapper:hover img {
+article img:hover {
   @apply brightness-105 dark:brightness-110;
 }
 
@@ -134,19 +132,6 @@ article img:hover,
   opacity: 1 !important;
   transform: none !important;
   transition: none !important;
-}
-
-/* 刹那 (Instants) 样式 */
-.instant-image-wrapper {
-  @apply relative overflow-hidden rounded-none;
-}
-
-.instant-image-wrapper picture {
-  @apply block;
-}
-
-.instant-image-wrapper img {
-  @apply w-full h-auto block;
 }
 
 /* 滚动条 */

@@ -4,7 +4,6 @@ export const SITE: Site = {
   NAME: "Syu's Blog",
   EMAIL: "riapsusr@gmail.com",
   NUM_POSTS_ON_HOMEPAGE: 5,
-  NUM_INSTANTS_ON_HOMEPAGE: 3
 };
 
 export const HOME: Metadata = {
@@ -17,22 +16,17 @@ export const POSTS: Metadata = {
   DESCRIPTION: "",
 };
 
-export const INSTANTS: Metadata = {
-  TITLE: "刹那",
-  DESCRIPTION: "",
-};
-
 export const ABOUT: Metadata = {
   TITLE: "关于",
   DESCRIPTION: "关于我",
 };
 
 export const SOCIALS: Socials = [
-  { 
+  {
     NAME: "Twitter",
     HREF: "https://x.com/riapsusr",
   },
-  { 
+  {
     NAME: "Telegram",
     HREF: "https://t.me/riapsusr"
   },

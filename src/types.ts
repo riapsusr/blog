@@ -2,7 +2,6 @@ export type Site = {
   NAME: string;
   EMAIL: string;
   NUM_POSTS_ON_HOMEPAGE: number;
-  NUM_INSTANTS_ON_HOMEPAGE: number;
 };
 
 export type Metadata = {

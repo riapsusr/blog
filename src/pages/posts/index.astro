@@ -103,7 +103,7 @@ const years = Object.keys(postsByYear).sort(
     function filterPosts() {
         // [关键修复] 安全检查：
         // 只有当页面存在 id="category-filter" 时才执行逻辑
-        // 如果当前是在 instants 页面，这里会获取到 null，函数直接返回，不再污染其他页面的 DOM
+        // 如果当前页面不存在这个筛选容器，这里会获取到 null，函数直接返回，避免污染其他页面的 DOM
         const filterContainer = document.getElementById('category-filter');
         if (!filterContainer) return;
 
