@@ -47,20 +47,6 @@ const { title, description, image = "/favicon.svg" } = Astro.props;
     if (backToTop) {
       backToTop.onclick = (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "auto" }); };
     }
-
-    const setupBtn = (id, theme) => {
-      const btn = document.getElementById(id);
-      if (btn) {
-        btn.onclick = () => {
-          if (theme === "system") localStorage.removeItem("theme");
-          else localStorage.setItem("theme", theme);
-          applyTheme();
-        };
-      }
-    };
-    setupBtn("light-theme-button", "light");
-    setupBtn("dark-theme-button", "dark");
-    setupBtn("system-theme-button", "system");
   }
 
   function onScroll() {

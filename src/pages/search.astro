@@ -21,48 +21,45 @@ import Container from "@components/Container.astro";
     const searchDiv = document.getElementById("search");
     // 如果元素存在且未被初始化（Pagefind 会在 div 内部创建结构，如果已经有内容说明可能已初始化，但最好先清空）
     if (searchDiv) {
-        const PagefindUI = window.PagefindUI;
-        if (typeof PagefindUI === "undefined") {
-            const warning = document.createElement("div");
-            warning.className = "text-center text-stone-500 py-10";
-            warning.innerHTML = "搜索功能仅在生产构建(Build)后可用<br>Dev 模式下无法预览搜索结果";
-            searchDiv.innerHTML = "";
-            searchDiv.appendChild(warning);
-            return;
-        }
+      const PagefindUI = window.PagefindUI;
+      if (typeof PagefindUI === "undefined") {
+        const warning = document.createElement("div");
+        warning.className = "text-center text-stone-500 py-10";
+        warning.innerHTML = "搜索功能仅在生产构建(Build)后可用<br>Dev 模式下无法预览搜索结果";
+        searchDiv.innerHTML = "";
+        searchDiv.appendChild(warning);
+        return;
+      }
 
-        searchDiv.innerHTML = ""; // 清空旧内容，确保重新初始化
-        new PagefindUI({ 
-            element: "#search", 
-            showSubResults: true,
-            showImages: false,
-            translations: {
-                placeholder: "搜索文章...",
-                clear_search: "清除",
-                load_more: "加载更多结果",
-                search_label: "站内搜索",
-                filters_label: "筛选",
-                zero_results: "未找到 [SEARCH_TERM] 的相关结果",
-                many_results: "找到 [COUNT] 个关于 [SEARCH_TERM] 的结果",
-                one_result: "找到 [COUNT] 个关于 [SEARCH_TERM] 的结果",
-                alt_search: "未找到 [SEARCH_TERM] 的结果。改为显示 [DIFFERENT_TERM] 的结果",
-                search_suggestion: "未找到 [SEARCH_TERM] 的结果。请尝试以下搜索词：",
-                searching: "正在搜索 [SEARCH_TERM]..."
-            }
-        });
+      searchDiv.innerHTML = ""; // 清空旧内容，确保重新初始化
+      new PagefindUI({
+        element: "#search",
+        showSubResults: true,
+        showImages: false,
+        translations: {
+          placeholder: "搜索文章...",
+          clear_search: "清除",
+          load_more: "加载更多结果",
+          search_label: "站内搜索",
+          filters_label: "筛选",
+          zero_results: "未找到 [SEARCH_TERM] 的相关结果",
+          many_results: "找到 [COUNT] 个关于 [SEARCH_TERM] 的结果",
+          one_result: "找到 [COUNT] 个关于 [SEARCH_TERM] 的结果",
+          alt_search: "未找到 [SEARCH_TERM] 的结果。改为显示 [DIFFERENT_TERM] 的结果",
+          search_suggestion: "未找到 [SEARCH_TERM] 的结果。请尝试以下搜索词：",
+          searching: "正在搜索 [SEARCH_TERM]..."
+        }
+      });
     }
   }
 
-  // View Transitions 页面切换加载
-  // document.addEventListener("astro:page-load", initPagefind);
-  
-  // 普通页面加载
+  // 页面加载时初始化搜索
   document.addEventListener("DOMContentLoaded", initPagefind);
 </script>
 
 <style is:global>
   /* Pagefind UI Customization */
-  
+
   /* 确保根元素宽度 */
   #search .pagefind-ui {
     @apply w-full flex flex-col gap-4 !important;
@@ -73,7 +70,7 @@ import Container from "@components/Container.astro";
     @apply relative flex flex-wrap items-center w-full !important;
     /* 恢复 flex 布局，但确保高度和宽度正确，flex-wrap 确保结果（如果作为子元素）换行 */
   }
-  
+
   /* 搜索框 */
   #search .pagefind-ui__search-input {
     @apply bg-transparent border-stone-200 dark:border-stone-700 text-black dark:text-white rounded-md !important;
@@ -87,7 +84,7 @@ import Container from "@components/Container.astro";
     @apply box-border !important;
     @apply block !important; /* 确保是块级显示 */
   }
-  
+
   #search .pagefind-ui__search-input:focus {
     @apply border-black dark:border-white outline-none !important;
   }
@@ -133,13 +130,13 @@ import Container from "@components/Container.astro";
     @apply block !important;
     @apply flex-none !important; /* 防止被 flex 压缩 */
   }
-  
+
   /* 单个结果项 */
   .pagefind-ui__result {
     @apply border-b border-black/5 dark:border-white/5 py-6 !important;
     @apply flex flex-col gap-2 !important;
   }
-  
+
   .pagefind-ui__result:last-child {
     @apply border-none !important;
   }
@@ -149,7 +146,7 @@ import Container from "@components/Container.astro";
     @apply text-lg font-medium text-black dark:text-white !important;
     @apply no-underline !important;
   }
-  
+
   .pagefind-ui__result-link {
     @apply text-black dark:text-white no-underline hover:underline underline-offset-4 decoration-black/20 dark:decoration-white/30 transition-all !important;
   }
@@ -160,7 +157,7 @@ import Container from "@components/Container.astro";
     @apply leading-relaxed !important;
     @apply font-normal !important;
   }
-  
+
   /* 高亮文本 */
   .pagefind-ui__result-excerpt mark {
     @apply bg-yellow-200 dark:bg-yellow-500/30 text-black dark:text-white rounded-none px-0.5 !important;
@@ -183,6 +180,6 @@ import Container from "@components/Container.astro";
     @apply transition-colors duration-200 !important;
     @apply text-sm !important;
   }
-  
+
   /* 隐藏 Pagefind 默认的放大镜图标（如果需要的话，可以保留，这里先不做处理） */
 </style>
