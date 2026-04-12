@@ -34,6 +34,18 @@ const { title, description, image = "/favicon.svg" } = Astro.props;
 
 <link rel="alternate" type="application/rss+xml" title={SITE.NAME} href={new URL("rss.xml", Astro.site)} />
 
+<!--
+NOTE: View Transitions 当前已禁用
+
+如需启用 View Transitions，请取消注释以下代码：
+<ClientRouter />
+
+但请注意：iOS Safari 的返回手势存在已知问题
+- 使用 View Transitions 时，苹果设备的返回按钮/手势可能无法正常返回上一页
+- 这是 WebKit View Transitions API 的实现限制，非 Astro 独有
+- 解决方案：使用 fallback="swap" 回退到整页刷新
+-->
+
 <script is:inline>
   function applyTheme() {
     const theme = localStorage.getItem("theme") || 
