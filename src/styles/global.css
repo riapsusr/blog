@@ -10,7 +10,7 @@
 *,
 *::before,
 *::after {
-  font-family: "LXGW WenKai Screen", "LXGWWenKaiScreen", "Songti SC", "Source Han Serif CN", serif !important;
+  font-family: "PingFang SC", "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif !important;
 }
 
 /* 唯独排除代码块，保持等宽字体 */
