@@ -53,20 +53,5 @@ NOTE: View Transitions 当前已禁用
     document.documentElement.classList.toggle("dark", theme === "dark");
   }
 
-  function init() {
-    onScroll();
-    const backToTop = document.getElementById("back-to-top");
-    if (backToTop) {
-      backToTop.onclick = (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "auto" }); };
-    }
-  }
-
-  function onScroll() {
-    const isScrolled = window.scrollY > 0;
-    document.documentElement.classList.toggle("scrolled", isScrolled);
-  }
-
   applyTheme();
-  document.addEventListener("DOMContentLoaded", init);
-  window.addEventListener("scroll", onScroll, { passive: true });
 </script>

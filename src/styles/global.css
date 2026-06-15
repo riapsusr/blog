@@ -6,19 +6,18 @@
    1. 基础布局
 ---------------------------------------------------------------- */
 
-/* 强制全站所有元素（除了代码块相关）使用文楷 */
+/* 强制全站所有元素（除了代码块相关）使用苹方 */
 *,
 *::before,
 *::after {
   font-family: "PingFang SC", "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif !important;
 }
 
-/* 唯独排除代码块，保持等宽字体 */
+/* 代码块使用等宽字体 */
 code,
 pre,
 kbd,
-samp,
-.mono {
+samp {
   font-family: "JetBrains Mono", "Cascadia Code", monospace !important;
 }
 
@@ -42,9 +41,7 @@ body {
 }
 
 body {
-  @apply antialiased flex flex-col bg-stone-100 dark:bg-stone-900 text-black/70 dark:text-white/85;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  @apply flex flex-col bg-stone-100 dark:bg-stone-900 text-black/70 dark:text-white/85 antialiased;
 }
 
 header {
@@ -124,9 +121,6 @@ article img:hover {
 /* ----------------------------------------------------------------
    4. 容器、静态化与间距
 ---------------------------------------------------------------- */
-.mx-auto.max-w-screen-sm {
-  @apply px-5;
-}
 
 .no-animation {
   opacity: 1 !important;
@@ -150,11 +144,3 @@ article img:hover {
 /* ----------------------------------------------------------------
    5. 悬浮目录样式
 ---------------------------------------------------------------- */
-
-#toc-desktop::-webkit-scrollbar {
-  width: 4px;
-}
-
-#toc-desktop::-webkit-scrollbar-thumb {
-  @apply bg-stone-200 dark:bg-stone-700;
-}

@@ -1,4 +1,4 @@
-import defaultTheme from "tailwindcss/defaultTheme";
+import typography from "@tailwindcss/typography";
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -7,16 +7,10 @@ export default {
     "./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}",
   ],
   theme: {
-    extend: {
-      fontFamily: {
-        // 使用 Tailwind 默认字体栈
-        sans: [...defaultTheme.fontFamily.sans],
-        serif: [...defaultTheme.fontFamily.serif],
-      },
-    },
+    extend: {},
   },
   future: {
     hoverOnlyWhenSupported: true,
   },
-  plugins: [require("@tailwindcss/typography")],
+  plugins: [typography],
 };

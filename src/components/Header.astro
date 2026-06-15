@@ -4,10 +4,9 @@ import Link from "@components/Link.astro";
 import { SITE } from "@consts";
 
 const { pathname } = Astro.url;
-const subpath = pathname.split("/")[1]; 
 
 const activeClass = (path: string) =>
-  (pathname === path || subpath === path.replace("/", ""))
+  (pathname === path || pathname.startsWith(path + "/") || pathname.startsWith(path + "?"))
     ? "text-black dark:text-white font-semibold"
     : "text-stone-500 dark:text-stone-400 hover:text-black dark:hover:text-white transition-colors";
 ---
