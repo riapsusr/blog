@@ -1,6 +1,5 @@
 ---
 title: 50%回调的研究与交易策略
-description: 拆解50%回调的交易细节
 date: 2026-06-03
 category: 交易
 ---

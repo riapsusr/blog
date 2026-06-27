@@ -5,5 +5,10 @@ export type Site = {
 
 export type Metadata = {
   TITLE: string;
-  DESCRIPTION: string;
+  DESCRIPTION?: string;
+};
+
+export type NavItem = {
+  path: string;
+  label: string;
 };

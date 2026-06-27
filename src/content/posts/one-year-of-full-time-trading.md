@@ -1,6 +1,5 @@
 ---
 title: 投身全职交易这一年
-description: 一场锻炼心态的旅程
 date: 2026-01-03
 category: 交易
 ---

@@ -1,16 +1,15 @@
 ---
-import { type CollectionEntry, getCollection, render } from "astro:content";
+import { type CollectionEntry, render } from "astro:content";
+import { getPublishedPosts, getPostSlug } from "@lib/utils";
 import PageLayout from "@layouts/PageLayout.astro";
 import Container from "@components/Container.astro";
 import FormattedDate from "@components/FormattedDate.astro";
 import TableOfContents from "@components/TableOfContents.astro";
 
 export async function getStaticPaths() {
-  const posts = (await getCollection("posts"))
-    .filter((post) => !post.data.draft)
-    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+  const posts = await getPublishedPosts();
   return posts.map((post) => ({
-    params: { slug: post.id.replace(/\.[^/.]+$/, "") },
+    params: { slug: getPostSlug(post.id) },
     props: post,
   }));
 }
@@ -19,7 +18,7 @@ const post = Astro.props;
 const { Content, headings } = await render(post);
 ---
 
-<PageLayout title={post.data.title} description={post.data.description}>
+<PageLayout title={post.data.title} description={post.data.title}>
   <Container>
     <div class="relative">
       <div class="space-y-4 mt-8 mb-12">
@@ -49,24 +48,61 @@ const { Content, headings } = await render(post);
     <TableOfContents headings={headings} />
   </div>
   <script>
+    let cleanupKeydown: (() => void) | null = null;
+
     function setupLightbox() {
+      if (cleanupKeydown) {
+        cleanupKeydown();
+        cleanupKeydown = null;
+      }
+
       const overlay = document.createElement("div");
       overlay.className = "img-lightbox-overlay";
       overlay.addEventListener("click", () => overlay.remove());
-      document.addEventListener("keydown", (e) => {
+
+      const handleKeydown = (e: KeyboardEvent) => {
         if (e.key === "Escape") overlay.remove();
-      });
+      };
+      document.addEventListener("keydown", handleKeydown);
+      cleanupKeydown = () => document.removeEventListener("keydown", handleKeydown);
 
       document.querySelectorAll("article img").forEach((img) => {
         img.addEventListener("click", () => {
-          const clone = img.cloneNode(true);
+          const clone = img.cloneNode(true) as HTMLImageElement;
           overlay.innerHTML = "";
           overlay.appendChild(clone);
           document.body.appendChild(overlay);
         });
       });
     }
+
     setupLightbox();
     document.addEventListener("astro:page-load", setupLightbox);
   </script>
+
+  <style>
+    .img-lightbox-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      cursor: zoom-out;
+    }
+
+    html.dark .img-lightbox-overlay {
+      background: #1c1917;
+    }
+
+    .img-lightbox-overlay img {
+      max-width: 90vw;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 0;
+      box-shadow: none;
+      cursor: zoom-out;
+    }
+  </style>
 </PageLayout>

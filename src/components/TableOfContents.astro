@@ -124,41 +124,41 @@ const tocItems = headings.filter((h) => h.depth === 2);
 (function() {
   'use strict';
 
-  // 模块级状态，便于跨初始化清理
+  /** @type {IntersectionObserver | null} */
   let observer = null;
+  /** @type {Array<() => void>} */
   const cleanupFns = [];
+  /** @type {boolean} */
   let isInitialized = false;
 
-  // 清理函数：断开 observer、移除事件监听器、重置 body 样式
   function cleanup() {
     if (observer) {
       observer.disconnect();
       observer = null;
     }
 
-    // 执行所有注册的清理函数
     while (cleanupFns.length > 0) {
       const fn = cleanupFns.pop();
-      try { fn(); } catch (e) { /* ignore cleanup errors */ }
+      try { fn(); } catch { /* ignore cleanup errors */ }
     }
 
-    // 确保 body overflow 被重置（防止抽屉关闭异常导致滚动锁定）
     document.body.style.overflow = "";
 
     isInitialized = false;
   }
 
   function setupTOC() {
-    // 防止重复初始化，或先清理旧的
     if (isInitialized) {
       cleanup();
     }
 
-    // 获取所有标题元素
+    /** @type {NodeListOf<HTMLElement>} */
     const headings = document.querySelectorAll(
       "article h2[id], article h3[id]",
     );
+    /** @type {NodeListOf<HTMLAnchorElement>} */
     const tocLinks = document.querySelectorAll(".toc-link");
+    /** @type {NodeListOf<HTMLAnchorElement>} */
     const tocLinksMobile = document.querySelectorAll(".toc-link-mobile");
 
     if (headings.length === 0) {
@@ -166,8 +166,8 @@ const tocItems = headings.filter((h) => h.depth === 2);
       return;
     }
 
-    // 构建 H3 → 前一个 H2 的映射
     const h2List = [...document.querySelectorAll("article h2[id]")];
+    /** @type {Map<string, string>} */
     const h3ToH2Map = new Map();
     document.querySelectorAll("article h3[id]").forEach((h3) => {
       let parentH2 = null;
@@ -182,11 +182,13 @@ const tocItems = headings.filter((h) => h.depth === 2);
       }
     });
 
-    // 更新激活状态
+    /**
+     * @param {string | null} activeId
+     */
     function updateActiveLink(activeId) {
-      // 如果是 H3，映射到对应的 H2
       const resolvedId = h3ToH2Map.get(activeId) || activeId;
 
+      /** @param {NodeListOf<HTMLAnchorElement>} links */
       const updateLinks = (links) => {
         links.forEach((link) => {
           const href = link.getAttribute("href");
@@ -206,7 +208,6 @@ const tocItems = headings.filter((h) => h.depth === 2);
       updateLinks(tocLinksMobile);
     }
 
-    // 使用 IntersectionObserver 监听标题
     observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -224,7 +225,6 @@ const tocItems = headings.filter((h) => h.depth === 2);
 
     headings.forEach((heading) => observer.observe(heading));
 
-    // 移动端抽屉逻辑 - 支持多实例
     const mobileContainers = document.querySelectorAll(".toc-mobile-container");
 
     mobileContainers.forEach(container => {
@@ -234,7 +234,6 @@ const tocItems = headings.filter((h) => h.depth === 2);
       const closeBtn = container.querySelector(".toc-close-btn");
       const links = container.querySelectorAll(".toc-link-mobile");
 
-      // 定义抽屉操作函数
       function openDrawer() {
         drawer?.classList.remove("translate-y-full");
         drawer?.classList.add("translate-y-0");
@@ -251,7 +250,7 @@ const tocItems = headings.filter((h) => h.depth === 2);
         document.body.style.overflow = "";
       }
 
-      // 包装事件处理器以便后续移除
+      /** @param {MouseEvent} e */
       const openHandler = (e) => {
         e.stopPropagation();
         openDrawer();
@@ -259,8 +258,9 @@ const tocItems = headings.filter((h) => h.depth === 2);
 
       const closeHandler = () => closeDrawer();
 
+      /** @param {MouseEvent} e */
       const linkClickHandler = (e) => {
-        const link = e.currentTarget;
+        const link = /** @type {HTMLAnchorElement} */ (e.currentTarget);
         e.preventDefault();
         closeDrawer();
 
@@ -281,7 +281,6 @@ const tocItems = headings.filter((h) => h.depth === 2);
         }
       };
 
-      // 绑定事件
       mobileBtn?.addEventListener("click", openHandler);
       closeBtn?.addEventListener("click", closeHandler);
       overlay?.addEventListener("click", closeHandler);
@@ -290,7 +289,6 @@ const tocItems = headings.filter((h) => h.depth === 2);
         link.addEventListener("click", linkClickHandler);
       });
 
-      // 注册清理函数
       cleanupFns.push(() => {
         mobileBtn?.removeEventListener("click", openHandler);
         closeBtn?.removeEventListener("click", closeHandler);
@@ -304,10 +302,8 @@ const tocItems = headings.filter((h) => h.depth === 2);
     isInitialized = true;
   }
 
-  // 初始化
   setupTOC();
 
-  // 支持 Astro View Transitions 页面切换
   document.addEventListener('astro:after-swap', () => {
     setupTOC();
   });

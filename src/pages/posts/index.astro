@@ -1,14 +1,12 @@
 ---
-import { type CollectionEntry, getCollection } from "astro:content";
+import { type CollectionEntry } from "astro:content";
+import { getPublishedPosts } from "@lib/utils";
 import PageLayout from "@layouts/PageLayout.astro";
 import Container from "@components/Container.astro";
 import ArrowCard from "@components/ArrowCard.astro";
 import { POSTS } from "@consts";
 
-// 1. 获取所有非草稿文章
-const allPosts = (await getCollection("posts"))
-  .filter((post) => !post.data.draft)
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const allPosts = await getPublishedPosts();
 
 // 2. 动态生成分类列表并按频次排序
 const categoryCounts = allPosts.reduce((acc, post) => {
@@ -184,6 +182,5 @@ const years = Object.keys(postsByYear).sort(
     // 初始化运行
     filterPosts();
 
-    // 如果你使用了 Astro View Transitions，需要在页面切换后重新运行
-    // document.addEventListener('astro:after-swap', filterPosts);
+    document.addEventListener('astro:after-swap', filterPosts);
 </script>

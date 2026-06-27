@@ -1,13 +1,11 @@
 ---
-import { getCollection } from "astro:content";
 import Container from "@components/Container.astro";
 import PageLayout from "@layouts/PageLayout.astro";
 import ArrowCard from "@components/ArrowCard.astro";
+import { getPublishedPosts } from "@lib/utils";
 import { SITE, HOME } from "@consts";
 
-const posts = (await getCollection("posts"))
-  .filter(post => !post.data.draft)
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+const posts = (await getPublishedPosts())
   .slice(0, SITE.NUM_POSTS_ON_HOMEPAGE);
 
 ---

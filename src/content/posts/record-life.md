@@ -1,6 +1,5 @@
 ---
 title: 用文字记录生活
-description: 不记录的话，日子就这样默默过去了
 date: 2025-12-12
 category: 生活
 ---

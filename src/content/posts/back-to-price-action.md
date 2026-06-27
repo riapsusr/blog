@@ -1,6 +1,5 @@
 ---
 title: 重新踏上价格行为交易之路
-description: 期待能成为全职交易员的那一天
 date: 2025-01-15
 category: 交易
 ---

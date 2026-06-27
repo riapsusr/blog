@@ -151,24 +151,43 @@
         nextFrame = window.requestAnimationFrame(() => move(event.clientX, event.clientY));
       };
 
+      let blinkTimer: ReturnType<typeof setTimeout> | null = null;
+      let resumeTimer: ReturnType<typeof setTimeout> | null = null;
+
       const blink = () => {
+        if (document.hidden) {
+          resumeTimer = setTimeout(blink, 1000);
+          return;
+        }
+
         leftEye?.setAttribute("ry", "1");
         rightEye?.setAttribute("ry", "1");
         leftShine?.setAttribute("opacity", "0");
         rightShine?.setAttribute("opacity", "0");
 
-        window.setTimeout(() => {
+        setTimeout(() => {
           leftEye?.setAttribute("ry", "7.5");
           rightEye?.setAttribute("ry", "7.5");
           leftShine?.setAttribute("opacity", "1");
           rightShine?.setAttribute("opacity", "1");
         }, 150);
 
-        window.setTimeout(blink, Math.random() * 3200 + 2200);
+        blinkTimer = setTimeout(blink, Math.random() * 3200 + 2200);
       };
 
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          if (blinkTimer) { clearTimeout(blinkTimer); blinkTimer = null; }
+          if (resumeTimer) { clearTimeout(resumeTimer); resumeTimer = null; }
+        } else {
+          if (!blinkTimer && !resumeTimer) {
+            blinkTimer = setTimeout(blink, Math.random() * 1000 + 500);
+          }
+        }
+      });
+
       window.addEventListener("pointermove", handlePointerMove, { passive: true });
-      window.setTimeout(blink, Math.random() * 1800 + 1200);
+      blinkTimer = setTimeout(blink, Math.random() * 1800 + 1200);
     });
   };
 

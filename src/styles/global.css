@@ -3,22 +3,22 @@
 @tailwind utilities;
 
 /* ----------------------------------------------------------------
-   1. 基础布局
+   1. 字体
 ---------------------------------------------------------------- */
 
-/* 强制全站所有元素（除了代码块相关）使用苹方 */
-*,
-*::before,
-*::after {
-  font-family: "PingFang SC", "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif !important;
-}
+@layer base {
+  *,
+  *::before,
+  *::after {
+    font-family: "PingFang SC", "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
+  }
 
-/* 代码块使用等宽字体 */
-code,
-pre,
-kbd,
-samp {
-  font-family: "JetBrains Mono", "Cascadia Code", monospace !important;
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: "JetBrains Mono", "Cascadia Code", monospace;
+  }
 }
 
 /* ----------------------------------------------------------------
@@ -27,7 +27,7 @@ samp {
 html {
   overflow-y: scroll;
   color-scheme: light;
-  scroll-behavior: auto !important;
+  scroll-behavior: auto;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -67,7 +67,6 @@ article {
   line-height: 1.8;
 }
 
-/* 标题锚点跳转时预留固定顶栏的偏移量 */
 article h1,
 article h2,
 article h3,
@@ -77,30 +76,25 @@ article h6 {
   scroll-margin-top: 6rem;
 }
 
-/* 二级标题装饰 */
 article h2 {
-  @apply relative pl-4 !important;
-  font-size: 1.35rem !important;
-  /* ~21.6px */
-  margin-top: 2.5rem !important;
-  margin-bottom: 1.25rem !important;
-  line-height: 1.4 !important;
+  @apply relative pl-4;
+  font-size: 1.35rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1.25rem;
+  line-height: 1.4;
 }
 
 article h3 {
-  font-size: 1.15rem !important;
-  /* ~18.4px */
-  margin-top: 2rem !important;
-  margin-bottom: 1rem !important;
+  font-size: 1.15rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
 }
 
 article h2::before {
   content: "";
   @apply absolute left-0 top-[0.25em] bottom-[0.25em] w-1 bg-red-500/80 dark:bg-red-500/80 rounded-sm;
-  /* 降低不透明度 */
 }
 
-/* 超链接：去掉下划线以外的所有干扰 */
 article a {
   @apply text-current underline underline-offset-4 decoration-black/40 dark:decoration-white/50 transition-all duration-300;
 }
@@ -109,31 +103,9 @@ article a:hover {
   @apply text-black dark:text-white decoration-black/60 dark:decoration-white/60;
 }
 
-/* 图片：cursor-zoom-in、无边框 */
 article img {
   @apply rounded-none border-none shadow-none transition-all duration-300;
   cursor: zoom-in;
-}
-
-/* 图片灯箱遮罩 */
-.img-lightbox-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: white;
-  cursor: zoom-out;
-}
-
-.img-lightbox-overlay img {
-  max-width: 90vw;
-  max-height: 90vh;
-  object-fit: contain;
-  border-radius: 0;
-  box-shadow: none;
-  cursor: zoom-out;
 }
 
 /* ----------------------------------------------------------------
@@ -141,8 +113,15 @@ article img {
 ---------------------------------------------------------------- */
 
 .no-animation {
-  opacity: 1 !important;
-  transform: none !important;
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+.no-transition,
+.no-transition *,
+.no-transition *::before,
+.no-transition *::after {
   transition: none !important;
 }
 
@@ -173,7 +152,6 @@ article img {
   background-clip: padding-box;
 }
 
-/* 隐藏滚动条但保留滚动功能 */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -196,7 +174,3 @@ html.dark ::-webkit-scrollbar-thumb:active {
   background: rgba(220, 220, 220, 0.6);
   background-clip: padding-box;
 }
-
-/* ----------------------------------------------------------------
-   5. 悬浮目录样式
----------------------------------------------------------------- */
