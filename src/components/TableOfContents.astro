@@ -5,8 +5,8 @@ export interface Props {
 
 const { headings } = Astro.props;
 
-// 只保留 h2 和 h3
-const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+// 只保留 h2
+const tocItems = headings.filter((h) => h.depth === 2);
 ---
 
 {
@@ -14,7 +14,7 @@ const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
     <>
       {/* 桌面端：右侧固定目录 */}
       <nav
-        class="hidden xl:block sticky top-32 w-48 max-h-[calc(100vh-8rem)] overflow-y-auto border border-black/10 dark:border-white/10 rounded-lg p-4"
+        class="hidden xl:block sticky top-32 w-48 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-hide border border-black/10 dark:border-white/10 rounded-lg p-4"
         aria-label="目录"
       >
         <div class="text-xs font-semibold text-stone-400 dark:text-stone-500 mb-3 uppercase tracking-wider">
@@ -96,7 +96,7 @@ const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
               </svg>
             </button>
           </div>
-          <ul class="p-5 space-y-3 overflow-y-auto max-h-[calc(60vh-60px)]">
+          <ul class="p-5 space-y-3 overflow-y-auto scrollbar-hide max-h-[calc(60vh-60px)]">
             {tocItems.map((item) => (
               <li
                 class:list={[
@@ -166,12 +166,31 @@ const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
       return;
     }
 
+    // 构建 H3 → 前一个 H2 的映射
+    const h2List = [...document.querySelectorAll("article h2[id]")];
+    const h3ToH2Map = new Map();
+    document.querySelectorAll("article h3[id]").forEach((h3) => {
+      let parentH2 = null;
+      for (let i = h2List.length - 1; i >= 0; i--) {
+        if (h2List[i].compareDocumentPosition(h3) & Node.DOCUMENT_POSITION_FOLLOWING) {
+          parentH2 = h2List[i];
+          break;
+        }
+      }
+      if (parentH2) {
+        h3ToH2Map.set(h3.getAttribute("id"), parentH2.getAttribute("id"));
+      }
+    });
+
     // 更新激活状态
     function updateActiveLink(activeId) {
+      // 如果是 H3，映射到对应的 H2
+      const resolvedId = h3ToH2Map.get(activeId) || activeId;
+
       const updateLinks = (links) => {
         links.forEach((link) => {
           const href = link.getAttribute("href");
-          const isActive = href === `#${activeId}`;
+          const isActive = href === `#${resolvedId}`;
 
           if (isActive) {
             link.classList.remove("text-stone-400", "dark:text-stone-500");

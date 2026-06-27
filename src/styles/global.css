@@ -41,11 +41,11 @@ body {
 }
 
 body {
-  @apply flex flex-col bg-stone-100 dark:bg-stone-900 text-black/70 dark:text-white/85 antialiased;
+  @apply flex flex-col bg-white dark:bg-stone-900 text-black/70 dark:text-white/85 antialiased;
 }
 
 header {
-  @apply fixed top-0 left-0 right-0 z-50 py-5 bg-stone-100/75 dark:bg-stone-900/25 backdrop-blur-sm saturate-200;
+  @apply fixed top-0 left-0 right-0 z-50 py-5 bg-white/75 dark:bg-stone-900/25 backdrop-blur-sm saturate-200;
 }
 
 main {
@@ -109,13 +109,31 @@ article a:hover {
   @apply text-black dark:text-white decoration-black/60 dark:decoration-white/60;
 }
 
-/* 图片：彻底直角、无边框 */
+/* 图片：cursor-zoom-in、无边框 */
 article img {
   @apply rounded-none border-none shadow-none transition-all duration-300;
+  cursor: zoom-in;
 }
 
-article img:hover {
-  @apply brightness-105 dark:brightness-110;
+/* 图片灯箱遮罩 */
+.img-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  cursor: zoom-out;
+}
+
+.img-lightbox-overlay img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: zoom-out;
 }
 
 /* ----------------------------------------------------------------
@@ -128,17 +146,55 @@ article img:hover {
   transition: none !important;
 }
 
-/* 滚动条 */
+/* 滚动条（类 X.com 风格） */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 10px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-stone-300 dark:bg-stone-700 rounded-full;
+  @apply rounded-full;
+  background: rgba(120, 120, 120, 0.3);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 100, 100, 0.5);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: rgba(80, 80, 80, 0.6);
+  background-clip: padding-box;
+}
+
+/* 隐藏滚动条但保留滚动功能 */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: rgba(180, 180, 180, 0.3);
+  background-clip: padding-box;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(200, 200, 200, 0.5);
+  background-clip: padding-box;
+}
+
+html.dark ::-webkit-scrollbar-thumb:active {
+  background: rgba(220, 220, 220, 0.6);
+  background-clip: padding-box;
 }
 
 /* ----------------------------------------------------------------

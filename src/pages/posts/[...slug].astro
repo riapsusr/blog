@@ -48,4 +48,25 @@ const { Content, headings } = await render(post);
   <div class="xl:hidden">
     <TableOfContents headings={headings} />
   </div>
+  <script>
+    function setupLightbox() {
+      const overlay = document.createElement("div");
+      overlay.className = "img-lightbox-overlay";
+      overlay.addEventListener("click", () => overlay.remove());
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") overlay.remove();
+      });
+
+      document.querySelectorAll("article img").forEach((img) => {
+        img.addEventListener("click", () => {
+          const clone = img.cloneNode(true);
+          overlay.innerHTML = "";
+          overlay.appendChild(clone);
+          document.body.appendChild(overlay);
+        });
+      });
+    }
+    setupLightbox();
+    document.addEventListener("astro:page-load", setupLightbox);
+  </script>
 </PageLayout>
