@@ -303,9 +303,5 @@ const tocItems = headings.filter((h) => h.depth === 2);
   }
 
   setupTOC();
-
-  document.addEventListener('astro:after-swap', () => {
-    setupTOC();
-  });
 })();
 </script>

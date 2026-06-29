@@ -7,10 +7,12 @@ export const SITE: Site = {
 
 export const HOME: Metadata = {
   TITLE: "首页",
+  DESCRIPTION: "Syu's Blog 首页",
 };
 
 export const POSTS: Metadata = {
   TITLE: "文章",
+  DESCRIPTION: "所有文章",
 };
 
 export const ABOUT: Metadata = {

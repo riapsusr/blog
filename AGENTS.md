@@ -35,7 +35,16 @@ src/
 │   └── posts/    # markdown post content
 ├── layouts/      # shared page layout
 ├── lib/          # utility functions
-├── pages/        # Astro routes
+├── pages/
+│   ├── index.astro       # homepage
+│   ├── about.astro       # about page
+│   ├── search.astro      # Pagefind UI
+│   ├── 404.astro         # 404 page
+│   ├── robots.txt.ts     # robots.txt
+│   ├── rss.xml.ts         # RSS feed
+│   └── posts/
+│       ├── index.astro       # posts archive with category filter
+│       └── [...slug].astro   # individual post page and TOC
 ├── styles/       # global styles
 ├── consts.ts     # site constants and metadata
 └── types.ts      # shared types
@@ -47,7 +56,6 @@ Posts live in `src/content/posts/*.md` with frontmatter:
 ```yaml
 ---
 title: 文章标题
-description: 文章描述
 date: YYYY-MM-DD
 category: 分类名称
 draft: false
@@ -55,14 +63,12 @@ draft: false
 ```
 
 ## Key files
-- `src/pages/index.astro` — homepage intro and latest posts list
-- `src/pages/posts/index.astro` — posts archive with category filter
-- `src/pages/posts/[...slug].astro` — individual post page and TOC integration
 - `src/content/config.ts` — post collection schema
 - `src/layouts/PageLayout.astro` — shared page shell
 - `src/styles/global.css` — global visual system
-- `src/pages/search.astro` — Pagefind UI integration
-- `src/pages/rss.xml.ts` — RSS feed generation
+
+## Maintenance
+- 如果页面结构有变更（新增、删除、重命名页面或组件），及时更新本文件中的源码结构等相关内容。
 
 ## Verification
 - Run `pnpm lint` after code changes.
