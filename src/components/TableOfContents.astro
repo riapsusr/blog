@@ -124,12 +124,15 @@ const tocItems = headings.filter((h) => h.depth === 2);
 (function() {
   'use strict';
 
+  if (window.__tocCleanup__) {
+    try { window.__tocCleanup__(); } catch { /* ignore */ }
+    window.__tocCleanup__ = null;
+  }
+
   /** @type {IntersectionObserver | null} */
   let observer = null;
   /** @type {Array<() => void>} */
   const cleanupFns = [];
-  /** @type {boolean} */
-  let isInitialized = false;
 
   function cleanup() {
     if (observer) {
@@ -143,14 +146,9 @@ const tocItems = headings.filter((h) => h.depth === 2);
     }
 
     document.body.style.overflow = "";
-
-    isInitialized = false;
   }
 
   function setupTOC() {
-    if (isInitialized) {
-      cleanup();
-    }
 
     /** @type {NodeListOf<HTMLElement>} */
     const headings = document.querySelectorAll(
@@ -162,7 +160,7 @@ const tocItems = headings.filter((h) => h.depth === 2);
     const tocLinksMobile = document.querySelectorAll(".toc-link-mobile");
 
     if (headings.length === 0) {
-      isInitialized = true;
+      window.__tocCleanup__ = cleanup;
       return;
     }
 
@@ -299,7 +297,7 @@ const tocItems = headings.filter((h) => h.depth === 2);
       });
     });
 
-    isInitialized = true;
+    window.__tocCleanup__ = cleanup;
   }
 
   setupTOC();

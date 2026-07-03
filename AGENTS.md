@@ -74,3 +74,18 @@ draft: false
 - Run `pnpm lint` after code changes.
 - Run `pnpm build` before finishing structural changes.
 - Pagefind search data is generated during `pnpm build`.
+
+## Module aliases
+`tsconfig.json` declares explicit path aliases used throughout the source:
+- `@components/*` -> `src/components/*`
+- `@layouts/*`    -> `src/layouts/*`
+- `@lib/*`        -> `src/lib/*`
+- `@consts`       -> `src/consts.ts`
+- `@types`        -> `src/types.ts`
+
+Astro reads these aliases from `tsconfig.json` and applies them to both Vite (build) and the TS language server (IDE). Do not use a bare `@*` wildcard — it risks colliding with npm package scopes like `@vercel`.
+
+## Client-side script conventions
+View Transitions are currently disabled (see `src/components/Head.astro`). The page-level client scripts (Footer theme toggle, post lightbox, TableOfContents, posts filter) are written for a single page load. They each guard against repeat initialization via a `__cleanup*` hook on `window` and/or a `data-ready` attribute.
+
+If View Transitions (`<ClientRouter />`) are re-enabled in future, each script must be re-run on `astro:page-load` and torn down on `astro:after-swap`. The existing cleanup hooks are the intended seam for that — reuse them instead of rewriting the scripts.

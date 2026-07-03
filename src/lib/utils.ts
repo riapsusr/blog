@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { getCollection } from "astro:content";
+import MarkdownIt from "markdown-it";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -30,13 +31,18 @@ export async function getPublishedPosts() {
     .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 }
 
+const excerptParser = new MarkdownIt();
+
+const TAG_RE = /<[^>]+>/g;
+const WS_RE = /\s+/g;
+
 export function getPostExcerpt(body: string, maxLength = 150): string {
-  const plain = body
-    .replace(/```[\s\S]*?```/g, "")
-    .replace(/!\[.*?\]\(.*?\)/g, "")
-    .replace(/\[([^\]]*)\]\(.*?\)/g, "$1")
-    .replace(/[#*`>~_|\\-]/g, "")
-    .replace(/\n{2,}/g, "\n")
+  const html = excerptParser.render(body);
+  const plain = html
+    .replace(TAG_RE, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&[a-z]+;/g, " ")
+    .replace(WS_RE, " ")
     .trim();
 
   if (plain.length <= maxLength) return plain;

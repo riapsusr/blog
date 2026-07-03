@@ -47,39 +47,56 @@ const { Content, headings } = await render(post);
   <div class="xl:hidden">
     <TableOfContents headings={headings} />
   </div>
-  <script>
-    let cleanupKeydown: (() => void) | null = null;
-
+  <script is:inline>
     function setupLightbox() {
-      if (cleanupKeydown) {
-        cleanupKeydown();
-        cleanupKeydown = null;
+      if (window.__cleanupLightbox__) {
+        try { window.__cleanupLightbox__(); } catch { /* ignore */ }
       }
 
       const overlay = document.createElement("div");
       overlay.className = "img-lightbox-overlay";
-      overlay.addEventListener("click", () => overlay.remove());
 
-      const handleKeydown = (e: KeyboardEvent) => {
-        if (e.key === "Escape") overlay.remove();
+      const closeOverlay = () => {
+        overlay.remove();
+        document.removeEventListener("keydown", handleKeydown);
       };
-      document.addEventListener("keydown", handleKeydown);
-      cleanupKeydown = () => document.removeEventListener("keydown", handleKeydown);
+      const handleKeydown = (e) => {
+        if (e.key === "Escape") closeOverlay();
+      };
 
-      document.querySelectorAll("article img").forEach((img) => {
-        img.addEventListener("click", () => {
-          const clone = img.cloneNode(true) as HTMLImageElement;
-          overlay.innerHTML = "";
-          overlay.appendChild(clone);
-          document.body.appendChild(overlay);
-        });
+      overlay.addEventListener("click", closeOverlay);
+      document.addEventListener("keydown", handleKeydown);
+
+      const handleImageClick = (e) => {
+        const img = e.currentTarget;
+        const clone = img.cloneNode(true);
+        overlay.innerHTML = "";
+        overlay.appendChild(clone);
+        document.body.appendChild(overlay);
+      };
+
+      const images = document.querySelectorAll("article img");
+      images.forEach((img) => {
+        img.addEventListener("click", handleImageClick);
       });
+
+      window.__cleanupLightbox__ = () => {
+        images.forEach((img) => {
+          img.removeEventListener("click", handleImageClick);
+        });
+        document.removeEventListener("keydown", handleKeydown);
+        overlay.remove();
+      };
     }
 
-    setupLightbox();
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", setupLightbox, { once: true });
+    } else {
+      setupLightbox();
+    }
   </script>
 
-  <style>
+  <style is:global>
     .img-lightbox-overlay {
       position: fixed;
       inset: 0;

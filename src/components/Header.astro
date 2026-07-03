@@ -6,10 +6,20 @@ import { SITE, NAV_ITEMS } from "@consts";
 
 const { pathname } = Astro.url;
 
-const activeClass = (path: string) =>
-  (pathname === path || pathname.startsWith(path + "/") || pathname.startsWith(path + "?"))
+const activeClass = (path: string) => {
+  let isActive: boolean;
+  if (path === "/") {
+    isActive = pathname === "/";
+  } else {
+    isActive = pathname === path
+      || pathname.startsWith(path + "/")
+      || pathname.startsWith(path + "?")
+      || pathname.startsWith(path + "#");
+  }
+  return isActive
     ? "text-black dark:text-white font-semibold"
     : "text-stone-500 dark:text-stone-400 hover:text-black dark:hover:text-white transition-colors";
+};
 ---
 
 <header class="py-5">
