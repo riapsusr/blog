@@ -13,21 +13,21 @@ const posts = (await getPublishedPosts())
   <Container>
     <div class="space-y-16">
       <section class="space-y-4">
-        <h4 class="font-semibold text-black dark:text-white text-lg">你好，我是 SyuEishin</h4>
+        <h4 class="font-semibold text-fg dark:text-fg-invert text-lg">你好，我是 SyuEishin</h4>
         <article>
           <p class="text-justify leading-relaxed">
             我会在这里记录下所有我想说的话，期待这个博客伴随着我，永续地经营下去。如果你想跟我说声嗨，可以通过以下方式联系。
           </p>
         </article>
         <div class="flex gap-5 pt-2">
-          <a href="https://t.me/riapsusr" target="_blank" rel="noopener noreferrer" class="text-stone-600 dark:text-stone-400 hover:text-blue-500 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></a>
-          <a href="https://x.com/riapsusr" target="_blank" rel="noopener noreferrer" class="text-stone-600 dark:text-stone-400 hover:text-sky-400 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg></a>
-          <a href="mailto:riapsusr@gmail.com" class="text-stone-600 dark:text-stone-400 hover:text-red-500 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></a>
+          <a href="https://t.me/riapsusr" target="_blank" rel="noopener noreferrer" aria-label="Telegram" class="text-muted hover:text-fg dark:hover:text-fg-invert transition-colors"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></a>
+          <a href="https://x.com/riapsusr" target="_blank" rel="noopener noreferrer" aria-label="X(Twitter)" class="text-muted hover:text-fg dark:hover:text-fg-invert transition-colors"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg></a>
+          <a href="mailto:riapsusr@gmail.com" aria-label="Email" class="text-muted hover:text-fg dark:hover:text-fg-invert transition-colors"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></a>
         </div>
       </section>
 
       <section class="space-y-6">
-        <h5 class="font-semibold text-black dark:text-white">最新文章</h5>
+        <h5 class="font-semibold text-fg dark:text-fg-invert">最新文章</h5>
         <ul class="flex flex-col gap-0">
           {posts.map((post, index) => (
             <li>

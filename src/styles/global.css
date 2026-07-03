@@ -41,7 +41,7 @@ body {
 }
 
 body {
-  @apply flex flex-col bg-white dark:bg-stone-900 text-black/70 dark:text-white/85 antialiased;
+  @apply flex flex-col bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-200 antialiased;
 }
 
 header {
@@ -49,7 +49,9 @@ header {
 }
 
 main {
+  /* 顶部留出固定 Header 高度。(仅 scroll-margin 给 anchor 用) */
   @apply flex-1 pt-24 pb-10;
+  scroll-margin-top: 6rem;
 }
 
 footer {
@@ -61,7 +63,7 @@ footer {
 ---------------------------------------------------------------- */
 article {
   @apply max-w-full prose dark:prose-invert prose-img:mx-auto prose-img:my-auto;
-  @apply prose-headings:font-semibold prose-headings:text-black prose-headings:dark:text-white;
+  @apply prose-headings:font-semibold prose-headings:text-fg dark:prose-headings:text-fg-invert;
   text-align: justify;
   text-justify: inter-character;
   line-height: 1.8;
@@ -72,7 +74,8 @@ article h2,
 article h3,
 article h4,
 article h5,
-article h6 {
+article h6,
+article [id] {
   scroll-margin-top: 6rem;
 }
 
@@ -100,11 +103,11 @@ article a {
 }
 
 article a:hover {
-  @apply text-black dark:text-white decoration-black/60 dark:decoration-white/60;
+  @apply text-fg dark:text-fg-invert decoration-black/60 dark:decoration-white/60;
 }
 
 article img {
-  @apply rounded-none border-none shadow-none transition-all duration-300;
+  @apply rounded-md border-none shadow-sm transition-all duration-300 max-w-full h-auto;
   cursor: zoom-in;
 }
 

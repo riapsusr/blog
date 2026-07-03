@@ -1,13 +1,13 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { formatShortDate, getPostSlug, getPostExcerpt } from "@lib/utils";
+import { formatShortDate, getPostURL, getPostExcerpt } from "@lib/utils";
 type Props = { 
   entry: CollectionEntry<"posts">;
   class?: string;
 }
 const { entry, class: className } = Astro.props;
 const formattedDate = formatShortDate(entry.data.date);
-const href = `/${entry.collection}/${getPostSlug(entry.id)}`;
+const href = getPostURL(entry);
 const excerpt = getPostExcerpt(entry.body);
 ---
 
@@ -18,22 +18,21 @@ const excerpt = getPostExcerpt(entry.body);
     className
   ]}
 >
-  <!-- 移除所有 font-sans 确保字体继承 -->
-  <div class="text-sm tabular-nums opacity-50 flex-shrink-0 font-mono">
+  <div class="text-sm tabular-nums opacity-60 flex-shrink-0 font-mono">
     {formattedDate}
   </div>
 
   <div class="flex flex-col flex-1 truncate">
-    <div class="font-medium text-stone-800 dark:text-stone-200 group-hover:text-black group-hover:dark:text-white transition-colors duration-300 text-base">
+    <div class="font-medium text-stone-700 dark:text-stone-200 group-hover:text-fg dark:group-hover:text-fg-invert transition-colors duration-300 text-base">
       {entry.data.title}
     </div>
-    <div class="text-sm opacity-50 truncate mt-1">
+    <div class="text-sm text-muted truncate mt-1">
       {excerpt}
     </div>
   </div>
 
   <div class="flex-shrink-0 ml-2">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-4 stroke-2 fill-none stroke-current opacity-20 group-hover:opacity-100 transition-all duration-300">
+    <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-4 stroke-2 fill-none stroke-current opacity-30 group-hover:opacity-100 transition-all duration-300">
       <line x1="5" y1="12" x2="19" y2="12" class="translate-x-3 group-hover:translate-x-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
       <polyline points="12 5 19 12 12 19" class="-translate-x-1 group-hover:translate-x-0 transition-transform duration-300" />
     </svg>

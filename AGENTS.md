@@ -34,7 +34,9 @@ src/
 │   ├── config.ts # content collection schema
 │   └── posts/    # markdown post content
 ├── layouts/      # shared page layout
-├── lib/          # utility functions
+├── lib/
+│   ├── utils.ts    # 日期/摘要/链接工具 (getPostURL, getPostExcerpt ...)
+│   └── cleanup.ts  # 客户端脚本统一 guard 模式
 ├── pages/
 │   ├── index.astro       # homepage
 │   ├── about.astro       # about page
@@ -44,7 +46,7 @@ src/
 │   ├── rss.xml.ts         # RSS feed
 │   └── posts/
 │       ├── index.astro       # posts archive with category filter
-│       └── [...slug].astro   # individual post page and TOC
+│       └── [...slug].astro   # individual post page, lightbox + TOC
 ├── styles/       # global styles
 ├── consts.ts     # site constants and metadata
 └── types.ts      # shared types
@@ -64,8 +66,15 @@ draft: false
 
 ## Key files
 - `src/content/config.ts` — post collection schema
-- `src/layouts/PageLayout.astro` — shared page shell
+- `src/layouts/PageLayout.astro` — shared page shell (含 head slot)
+- `src/lib/utils.ts` — `getPostURL` / `getPostExcerpt` 等集中工具，所有文章链接构造必须走此模块
+- `src/lib/cleanup.ts` — 客户端脚本初始化/清理的统一接缝
 - `src/styles/global.css` — global visual system
+- `tailwind.config.mjs` — semantic colors (`fg` / `fg-invert` / `muted` / `line`)，避免散落硬编码 `text-black` / `text-stone-500`
+
+## Design tokens
+- 在 `tailwind.config.mjs` 已声明语义色：`fg`(亮色主前景)、`fg-invert`(暗色主前景)、`muted`(次级文本，对比度 ≥ 4.5:1)、`line`(分隔线)。优先用这些 token，避免直接写 `text-black`、`text-stone-500`、`border-black/5` 等散落颜色。
+- 圆角阶沿用 Tailwind 默认 (`sm` 轻 / `md` 标准卡片 / `lg` 浮层 / `full` 胶囊)。文章列表卡片基础类**不带** `rounded-*`，由列表项首/末通过 `rounded-t-lg` / `rounded-b-lg border-b-0` 控制圆角；`posts/index.astro` 的筛选脚本会动态重设首/末可见项圆角——保持该逻辑。
 
 ## Maintenance
 - 如果页面结构有变更（新增、删除、重命名页面或组件），及时更新本文件中的源码结构等相关内容。
@@ -86,6 +95,6 @@ draft: false
 Astro reads these aliases from `tsconfig.json` and applies them to both Vite (build) and the TS language server (IDE). Do not use a bare `@*` wildcard — it risks colliding with npm package scopes like `@vercel`.
 
 ## Client-side script conventions
-View Transitions are currently disabled (see `src/components/Head.astro`). The page-level client scripts (Footer theme toggle, post lightbox, TableOfContents, posts filter) are written for a single page load. They each guard against repeat initialization via a `__cleanup*` hook on `window` and/or a `data-ready` attribute.
+View Transitions are currently disabled (see `src/components/Head.astro`). The page-level client scripts (Footer theme toggle, post lightbox, TableOfContents, posts filter, pagefind) are written for a single page load. They each guard against repeat initialization via a unified `__cleanup*` hook on `window`（如 `__cleanupLightbox__` / `__tocCleanup__` / `__cleanupPostFilter__` / `__cleanupPagefind__` / `__cleanupDogLogo__`）。`src/lib/cleanup.ts` 提供该模式的 TS 版辅助（`withCleanup` / `runOnReady` / `markReady`）供模块脚本使用；inline 脚本沿用统一的 guard 模式即可。
 
 If View Transitions (`<ClientRouter />`) are re-enabled in future, each script must be re-run on `astro:page-load` and torn down on `astro:after-swap`. The existing cleanup hooks are the intended seam for that — reuse them instead of rewriting the scripts.

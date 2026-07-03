@@ -17,6 +17,7 @@ const { title, description, image = "/favicon.svg" } = Astro.props;
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="generator" content={Astro.generator} />
 <link rel="canonical" href={canonicalURL} />
+<meta name="color-scheme" content="light dark" />
 <title>{title}</title>
 <meta name="title" content={title} />
 <meta name="description" content={description} />
@@ -57,7 +58,11 @@ NOTE: View Transitions 当前已禁用
     } catch {
       /* localStorage may throw in privacy mode; fall back to light */
     }
-    document.documentElement.classList.toggle("dark", theme === "dark");
+    const isDark = theme === "dark";
+    const root = document.documentElement;
+    root.classList.toggle("dark", isDark);
+    // 同步 color-scheme 给浏览器表单控件/滚动条使用，减少首帧闪烁
+    root.style.colorScheme = isDark ? "dark" : "light";
   }
 
   applyTheme();

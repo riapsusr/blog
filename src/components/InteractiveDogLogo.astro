@@ -85,6 +85,16 @@
 </svg>
 
 <script>
+  // 1.5 统一 guard 模式：每次 init 前先收尾上一次。
+  declare global {
+    interface Window {
+      __cleanupDogLogo__?: () => void;
+    }
+  }
+  if (window.__cleanupDogLogo__) {
+    try { window.__cleanupDogLogo__(); } catch { /* ignore */ }
+  }
+
   const initDogLogos = () => {
     const logos = document.querySelectorAll<SVGSVGElement>("[data-dog-logo]");
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -196,4 +206,7 @@
   } else {
     initDogLogos();
   }
+
+  // 该脚本仅用 dataset.ready 自查防止重复初始化，cleanup 占位以便统一生命周期。
+  window.__cleanupDogLogo__ = () => { /* 单次初始化、无监听需要} */ };
 </script>

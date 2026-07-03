@@ -17,7 +17,7 @@ const tocItems = headings.filter((h) => h.depth === 2);
         class="hidden xl:block sticky top-32 w-48 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-hide border border-black/10 dark:border-white/10 rounded-lg p-4"
         aria-label="目录"
       >
-        <div class="text-xs font-semibold text-stone-400 dark:text-stone-500 mb-3 uppercase tracking-wider">
+        <div class="text-xs font-semibold text-muted mb-3 uppercase tracking-wider">
           目录
         </div>
         <ul class="space-y-2 text-sm">
@@ -31,7 +31,7 @@ const tocItems = headings.filter((h) => h.depth === 2);
             >
               <a
                 href={`#${item.slug}`}
-                class="toc-link block text-stone-400 dark:text-stone-500 hover:text-stone-700 dark:hover:text-stone-300 transition-colors duration-200 leading-relaxed"
+                class="toc-link block text-muted hover:text-fg dark:hover:text-fg-invert transition-colors duration-200 leading-relaxed"
               >
                 {item.text}
               </a>
@@ -48,6 +48,8 @@ const tocItems = headings.filter((h) => h.depth === 2);
           aria-label="打开目录"
         >
           <svg
+            aria-hidden="true"
+            focusable="false"
             xmlns="http://www.w3.org/2000/svg"
             class="w-5 h-5"
             viewBox="0 0 24 24"
@@ -74,20 +76,22 @@ const tocItems = headings.filter((h) => h.depth === 2);
           aria-label="目录"
         >
           <div class="flex items-center justify-between px-5 py-4 border-b border-stone-200 dark:border-stone-800">
-            <span class="text-sm font-semibold text-stone-600 dark:text-stone-300">
-              目录
-            </span>
-            <button
-              class="toc-close-btn w-8 h-8 flex items-center justify-center text-stone-500 hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
-              aria-label="关闭目录"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="w-5 h-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
+          <span class="text-sm font-semibold text-muted">
+            目录
+          </span>
+          <button
+            class="toc-close-btn w-8 h-8 flex items-center justify-center text-muted hover:text-fg dark:hover:text-fg-invert transition-colors"
+            aria-label="关闭目录"
+          >
+            <svg
+              aria-hidden="true"
+              focusable="false"
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
@@ -107,7 +111,7 @@ const tocItems = headings.filter((h) => h.depth === 2);
               >
                 <a
                   href={`#${item.slug}`}
-                  class="toc-link-mobile block text-stone-400 dark:text-stone-500 hover:text-stone-700 dark:hover:text-stone-300 transition-colors duration-200 py-1"
+                  class="toc-link-mobile block text-muted hover:text-fg dark:hover:text-fg-invert transition-colors duration-200 py-1"
                 >
                   {item.text}
                 </a>
@@ -193,11 +197,11 @@ const tocItems = headings.filter((h) => h.depth === 2);
           const isActive = href === `#${resolvedId}`;
 
           if (isActive) {
-            link.classList.remove("text-stone-400", "dark:text-stone-500");
-            link.classList.add("text-black", "dark:text-white", "font-semibold");
+            link.classList.remove("text-muted");
+            link.classList.add("text-fg", "dark:text-fg-invert", "font-semibold");
           } else {
-            link.classList.add("text-stone-400", "dark:text-stone-500");
-            link.classList.remove("text-black", "dark:text-white", "font-semibold");
+            link.classList.add("text-muted");
+            link.classList.remove("text-fg", "dark:text-fg-invert", "font-semibold");
           }
         });
       };

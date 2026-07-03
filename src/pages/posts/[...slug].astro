@@ -1,6 +1,6 @@
 ---
 import { type CollectionEntry, render } from "astro:content";
-import { getPublishedPosts, getPostSlug } from "@lib/utils";
+import { getPublishedPosts, getPostSlug, getPostExcerpt } from "@lib/utils";
 import PageLayout from "@layouts/PageLayout.astro";
 import Container from "@components/Container.astro";
 import FormattedDate from "@components/FormattedDate.astro";
@@ -16,21 +16,23 @@ export async function getStaticPaths() {
 type Props = CollectionEntry<"posts">;
 const post = Astro.props;
 const { Content, headings } = await render(post);
+// 1.1 SEO description：用真实摘要，而非标题占位
+const description = getPostExcerpt(post.body, 160);
 ---
 
-<PageLayout title={post.data.title} description={post.data.title}>
+<PageLayout title={post.data.title} description={description}>
   <Container>
     <div class="relative">
       <div class="space-y-4 mt-8 mb-12">
-        <h1 class="text-2xl font-semibold text-black dark:text-white leading-tight">
+        <h1 class="text-2xl font-semibold text-fg dark:text-fg-invert leading-tight">
           {post.data.title}
         </h1>
-        <div class="flex items-center gap-2 text-sm text-stone-500 dark:text-stone-400">
+        <div class="flex items-center gap-2 text-sm text-muted">
           <FormattedDate date={post.data.date} />
-          <span>&bull;</span>
+          <span aria-hidden="true">&bull;</span>
           <a 
               href={`/posts?category=${encodeURIComponent(post.data.category)}`}
-              class="hover:text-black dark:hover:text-white underline underline-offset-2 transition-colors"
+              class="hover:text-fg dark:hover:text-fg-invert underline underline-offset-2 transition-colors"
           >
               {post.data.category}
           </a>
@@ -48,52 +50,61 @@ const { Content, headings } = await render(post);
     <TableOfContents headings={headings} />
   </div>
   <script is:inline>
-    function setupLightbox() {
+    (function () {
+      // 1.5 统一 guard 模式：先收尾上一次
       if (window.__cleanupLightbox__) {
         try { window.__cleanupLightbox__(); } catch { /* ignore */ }
       }
 
-      const overlay = document.createElement("div");
-      overlay.className = "img-lightbox-overlay";
+      function setupLightbox() {
+        const overlay = document.createElement("div");
+        overlay.className = "img-lightbox-overlay";
+        overlay.setAttribute("role", "dialog");
+        overlay.setAttribute("aria-modal", "true");
+        overlay.setAttribute("aria-label", "图片预览");
 
-      const closeOverlay = () => {
-        overlay.remove();
-        document.removeEventListener("keydown", handleKeydown);
-      };
-      const handleKeydown = (e) => {
-        if (e.key === "Escape") closeOverlay();
-      };
+        const handleKeydown = (e) => {
+          if (e.key === "Escape") closeOverlay();
+        };
 
-      overlay.addEventListener("click", closeOverlay);
-      document.addEventListener("keydown", handleKeydown);
+        const closeOverlay = () => {
+          overlay.remove();
+          document.removeEventListener("keydown", handleKeydown);
+        };
 
-      const handleImageClick = (e) => {
-        const img = e.currentTarget;
-        const clone = img.cloneNode(true);
-        overlay.innerHTML = "";
-        overlay.appendChild(clone);
-        document.body.appendChild(overlay);
-      };
+        overlay.addEventListener("click", closeOverlay);
+        document.addEventListener("keydown", handleKeydown);
 
-      const images = document.querySelectorAll("article img");
-      images.forEach((img) => {
-        img.addEventListener("click", handleImageClick);
-      });
+        const handleImageClick = (e) => {
+          const img = e.currentTarget;
+          const clone = img.cloneNode(true);
+          overlay.innerHTML = "";
+          overlay.appendChild(clone);
+          document.body.appendChild(overlay);
+        };
 
-      window.__cleanupLightbox__ = () => {
+        const images = document.querySelectorAll("article img");
         images.forEach((img) => {
-          img.removeEventListener("click", handleImageClick);
+          img.setAttribute("loading", "lazy");
+          img.setAttribute("decoding", "async");
+          img.addEventListener("click", handleImageClick);
         });
-        document.removeEventListener("keydown", handleKeydown);
-        overlay.remove();
-      };
-    }
 
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", setupLightbox, { once: true });
-    } else {
-      setupLightbox();
-    }
+        window.__cleanupLightbox__ = () => {
+          images.forEach((img) => {
+            img.removeEventListener("click", handleImageClick);
+          });
+          document.removeEventListener("keydown", handleKeydown);
+          overlay.remove();
+        };
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", setupLightbox, { once: true });
+      } else {
+        setupLightbox();
+      }
+    })();
   </script>
 
   <style is:global>
@@ -105,18 +116,20 @@ const { Content, headings } = await render(post);
       align-items: center;
       justify-content: center;
       background: white;
+      color-scheme: light;
       cursor: zoom-out;
     }
 
     html.dark .img-lightbox-overlay {
       background: #1c1917;
+      color-scheme: dark;
     }
 
     .img-lightbox-overlay img {
       max-width: 90vw;
       max-height: 90vh;
       object-fit: contain;
-      border-radius: 0;
+      border-radius: 8px;
       box-shadow: none;
       cursor: zoom-out;
     }

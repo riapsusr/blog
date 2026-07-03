@@ -17,8 +17,8 @@ const activeClass = (path: string) => {
       || pathname.startsWith(path + "#");
   }
   return isActive
-    ? "text-black dark:text-white font-semibold"
-    : "text-stone-500 dark:text-stone-400 hover:text-black dark:hover:text-white transition-colors";
+    ? "text-fg dark:text-fg-invert font-semibold"
+    : "text-muted hover:text-fg dark:hover:text-fg-invert transition-colors";
 };
 ---
 
@@ -26,15 +26,15 @@ const activeClass = (path: string) => {
   <Container>
     <div class="flex flex-wrap gap-y-2 justify-between items-center">
       <Link href="/" underline={false} aria-label={SITE.NAME}>
-        <div class="flex items-center text-black dark:text-white">
+        <div class="flex items-center text-fg dark:text-fg-invert">
           <InteractiveDogLogo />
         </div>
       </Link>
 
-      <nav class="flex gap-1 sm:gap-2 text-sm items-center">
+      <nav class="flex gap-1 sm:gap-2 text-sm items-center" aria-label="主导航">
         {NAV_ITEMS.map((item) => (
           <Link href={item.path} underline={false}>
-            <span class:list={["px-2 py-1.5 rounded-none text-center block", activeClass(item.path)]}>
+            <span class:list={["px-2 py-1.5 rounded-sm text-center block", activeClass(item.path)]}>
               {item.label}
             </span>
           </Link>
