@@ -51,87 +51,19 @@ const description = getPostExcerpt(post.body, 160);
   </div>
   <script is:inline>
     (function () {
-      // 1.5 统一 guard 模式：先收尾上一次
-      if (window.__cleanupLightbox__) {
-        try { window.__cleanupLightbox__(); } catch { /* ignore */ }
-      }
-
-      function setupLightbox() {
-        const overlay = document.createElement("div");
-        overlay.className = "img-lightbox-overlay";
-        overlay.setAttribute("role", "dialog");
-        overlay.setAttribute("aria-modal", "true");
-        overlay.setAttribute("aria-label", "图片预览");
-
-        const handleKeydown = (e) => {
-          if (e.key === "Escape") closeOverlay();
-        };
-
-        const closeOverlay = () => {
-          overlay.remove();
-          document.removeEventListener("keydown", handleKeydown);
-        };
-
-        overlay.addEventListener("click", closeOverlay);
-        document.addEventListener("keydown", handleKeydown);
-
-        const handleImageClick = (e) => {
-          const img = e.currentTarget;
-          const clone = img.cloneNode(true);
-          overlay.innerHTML = "";
-          overlay.appendChild(clone);
-          document.body.appendChild(overlay);
-        };
-
+      function setupImages() {
         const images = document.querySelectorAll("article img");
         images.forEach((img) => {
           img.setAttribute("loading", "lazy");
           img.setAttribute("decoding", "async");
-          img.addEventListener("click", handleImageClick);
         });
-
-        window.__cleanupLightbox__ = () => {
-          images.forEach((img) => {
-            img.removeEventListener("click", handleImageClick);
-          });
-          document.removeEventListener("keydown", handleKeydown);
-          overlay.remove();
-        };
       }
 
       if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", setupLightbox, { once: true });
+        document.addEventListener("DOMContentLoaded", setupImages, { once: true });
       } else {
-        setupLightbox();
+        setupImages();
       }
     })();
   </script>
-
-  <style is:global>
-    .img-lightbox-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: white;
-      color-scheme: light;
-      cursor: zoom-out;
-    }
-
-    html.dark .img-lightbox-overlay {
-      background: #1c1917;
-      color-scheme: dark;
-    }
-
-    .img-lightbox-overlay img {
-      max-width: 90vw;
-      max-height: 90vh;
-      object-fit: contain;
-      border-radius: 8px;
-      box-shadow: none;
-      cursor: zoom-out;
-    }
-  </style>
 </PageLayout>

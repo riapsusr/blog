@@ -46,7 +46,7 @@ src/
 │   ├── rss.xml.ts         # RSS feed
 │   └── posts/
 │       ├── index.astro       # posts archive with category filter
-│       └── [...slug].astro   # individual post page, lightbox + TOC
+│       └── [...slug].astro   # individual post page, TOC
 ├── styles/       # global styles
 ├── consts.ts     # site constants and metadata
 └── types.ts      # shared types
@@ -95,6 +95,6 @@ draft: false
 Astro reads these aliases from `tsconfig.json` and applies them to both Vite (build) and the TS language server (IDE). Do not use a bare `@*` wildcard — it risks colliding with npm package scopes like `@vercel`.
 
 ## Client-side script conventions
-View Transitions are currently disabled (see `src/components/Head.astro`). The page-level client scripts (Footer theme toggle, post lightbox, TableOfContents, posts filter, pagefind) are written for a single page load. They each guard against repeat initialization via a unified `__cleanup*` hook on `window`（如 `__cleanupLightbox__` / `__tocCleanup__` / `__cleanupPostFilter__` / `__cleanupPagefind__` / `__cleanupDogLogo__`）。`src/lib/cleanup.ts` 提供该模式的 TS 版辅助（`withCleanup` / `runOnReady` / `markReady`）供模块脚本使用；inline 脚本沿用统一的 guard 模式即可。
+View Transitions are currently disabled (see `src/components/Head.astro`). The page-level client scripts (Footer theme toggle, TableOfContents, posts filter, pagefind) are written for a single page load. They each guard against repeat initialization via a unified `__cleanup*` hook on `window`（如 `__tocCleanup__` / `__cleanupPostFilter__` / `__cleanupPagefind__` / `__cleanupDogLogo__`）。`src/lib/cleanup.ts` 提供该模式的 TS 版辅助（`withCleanup` / `runOnReady` / `markReady`）供模块脚本使用；inline 脚本沿用统一的 guard 模式即可。
 
 If View Transitions (`<ClientRouter />`) are re-enabled in future, each script must be re-run on `astro:page-load` and torn down on `astro:after-swap`. The existing cleanup hooks are the intended seam for that — reuse them instead of rewriting the scripts.

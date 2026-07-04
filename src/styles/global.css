@@ -107,8 +107,7 @@ article a:hover {
 }
 
 article img {
-  @apply rounded-md border-none shadow-sm transition-all duration-300 max-w-full h-auto;
-  cursor: zoom-in;
+  @apply rounded-md max-w-full h-auto;
 }
 
 /* ----------------------------------------------------------------
