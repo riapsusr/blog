@@ -14,7 +14,7 @@ const tocItems = headings.filter((h) => h.depth === 2);
     <>
       {/* 桌面端：右侧固定目录 */}
       <nav
-        class="hidden xl:block sticky top-32 w-48 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-hide border border-black/10 dark:border-white/10 rounded-lg p-4"
+        class="hidden xl:block sticky top-32 w-48 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-hide border border-line rounded-lg p-4"
         aria-label="目录"
       >
         <div class="text-xs font-semibold text-muted mb-3 uppercase tracking-wider">
@@ -23,10 +23,7 @@ const tocItems = headings.filter((h) => h.depth === 2);
         <ul class="space-y-2 text-sm">
           {tocItems.map((item) => (
             <li
-              class:list={[
-                "toc-item transition-all duration-200",
-                item.depth === 3 && "pl-3",
-              ]}
+              class="toc-item transition-all duration-200"
               data-slug={item.slug}
             >
               <a
@@ -44,8 +41,11 @@ const tocItems = headings.filter((h) => h.depth === 2);
       <div class="xl:hidden toc-mobile-container">
         {/* 悬浮按钮 */}
         <button
+          type="button"
           class="toc-mobile-btn fixed bottom-28 right-5 z-40 w-10 h-10 bg-stone-200 dark:bg-stone-800 rounded-sm shadow-lg flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors duration-200"
           aria-label="打开目录"
+          aria-expanded="false"
+          aria-controls="toc-drawer"
         >
           <svg
             aria-hidden="true"
@@ -68,30 +68,33 @@ const tocItems = headings.filter((h) => h.depth === 2);
         {/* 遮罩层 */}
         <div
           class="toc-overlay fixed inset-0 z-40 bg-black/30 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"
+          data-toc-overlay
         />
 
         {/* 抽屉 */}
         <nav
+          id="toc-drawer"
           class="toc-drawer fixed bottom-0 left-0 right-0 z-50 bg-stone-100 dark:bg-stone-900 rounded-t-sm shadow-2xl transform translate-y-full transition-transform duration-300 ease-out max-h-[60vh] overflow-hidden"
           aria-label="目录"
         >
-          <div class="flex items-center justify-between px-5 py-4 border-b border-stone-200 dark:border-stone-800">
-          <span class="text-sm font-semibold text-muted">
-            目录
-          </span>
-          <button
-            class="toc-close-btn w-8 h-8 flex items-center justify-center text-muted hover:text-fg dark:hover:text-fg-invert transition-colors"
-            aria-label="关闭目录"
-          >
-            <svg
-              aria-hidden="true"
-              focusable="false"
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-5 h-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
+          <div class="flex items-center justify-between px-5 py-4 border-b border-line">
+            <span class="text-sm font-semibold text-muted">
+              目录
+            </span>
+            <button
+              type="button"
+              class="toc-close-btn w-8 h-8 flex items-center justify-center text-muted hover:text-fg dark:hover:text-fg-invert transition-colors"
+              aria-label="关闭目录"
+            >
+              <svg
+                aria-hidden="true"
+                focusable="false"
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
@@ -103,10 +106,7 @@ const tocItems = headings.filter((h) => h.depth === 2);
           <ul class="p-5 space-y-3 overflow-y-auto scrollbar-hide max-h-[calc(60vh-60px)]">
             {tocItems.map((item) => (
               <li
-                class:list={[
-                  "toc-item-mobile transition-all duration-200",
-                  item.depth === 3 && "pl-4",
-                ]}
+                class="toc-item-mobile transition-all duration-200"
                 data-slug={item.slug}
               >
                 <a
@@ -124,6 +124,14 @@ const tocItems = headings.filter((h) => h.depth === 2);
   )
 }
 
+<style is:global>
+  /* active 高亮 —— 由脚本统一切换 data-active 属性，样式集中在此 */
+  .toc-item[data-active] .toc-link,
+  .toc-item-mobile[data-active] .toc-link-mobile {
+    @apply text-fg dark:text-fg-invert font-semibold;
+  }
+</style>
+
 <script is:inline>
 (function() {
   'use strict';
@@ -137,6 +145,9 @@ const tocItems = headings.filter((h) => h.depth === 2);
   let observer = null;
   /** @type {Array<() => void>} */
   const cleanupFns = [];
+
+  /** @type {string | null} 当前激活 h2 的 id */
+  let activeId = null;
 
   function cleanup() {
     if (observer) {
@@ -152,89 +163,140 @@ const tocItems = headings.filter((h) => h.depth === 2);
     document.body.style.overflow = "";
   }
 
+  /**
+   * @param {string | null} id
+   */
+  function setActive(id) {
+    if (id === activeId) return;
+    activeId = id;
+
+    document.querySelectorAll('.toc-item, .toc-item-mobile').forEach((li) => {
+      if (li instanceof HTMLElement) {
+        if (li.dataset.slug === id) {
+          li.setAttribute('data-active', '');
+        } else {
+          li.removeAttribute('data-active');
+        }
+      }
+    });
+  }
+
   function setupTOC() {
 
     /** @type {NodeListOf<HTMLElement>} */
-    const headings = document.querySelectorAll(
-      "article h2[id], article h3[id]",
-    );
+    const headings = document.querySelectorAll("article h2[id]");
     /** @type {NodeListOf<HTMLAnchorElement>} */
     const tocLinks = document.querySelectorAll(".toc-link");
-    /** @type {NodeListOf<HTMLAnchorElement>} */
-    const tocLinksMobile = document.querySelectorAll(".toc-link-mobile");
 
     if (headings.length === 0) {
       window.__tocCleanup__ = cleanup;
       return;
     }
 
-    const h2List = [...document.querySelectorAll("article h2[id]")];
-    /** @type {Map<string, string>} */
-    const h3ToH2Map = new Map();
-    document.querySelectorAll("article h3[id]").forEach((h3) => {
-      let parentH2 = null;
-      for (let i = h2List.length - 1; i >= 0; i--) {
-        if (h2List[i].compareDocumentPosition(h3) & Node.DOCUMENT_POSITION_FOLLOWING) {
-          parentH2 = h2List[i];
+    /** 滚动到指定标题并同步 URL hash @param {string} targetId @param {string | null} href */
+    function scrollToHeading(targetId, href) {
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (href) history.replaceState(null, "", href);
+      setActive(targetId);
+    }
+
+    /**
+     * 平滑滚动点击处理，桌面端和移动端共用。
+     * @param {MouseEvent} e
+     * @param {HTMLAnchorElement} link
+     * @param {(() => void) | null} [after]
+     */
+    function linkClickHandler(e, link, after) {
+      const href = link.getAttribute("href");
+      const targetId = href ? href.substring(1) : null;
+      if (!targetId) return;
+      e.preventDefault();
+      if (typeof after === "function") after();
+      scrollToHeading(targetId, href);
+    }
+
+    // 桌面端链接：平滑滚动 + URL 同步
+    tocLinks.forEach((link) => {
+      const handler = /** @param {MouseEvent} e */ (e) => linkClickHandler(e, link, null);
+      link.addEventListener("click", handler);
+      cleanupFns.push(() => link.removeEventListener("click", handler));
+    });
+
+    // —— 激活态追踪 ——
+    // 单 threshold 在短段落或长 h2 之间会出现“没人在视口里”的情况，
+    // 用滚动兜底：每次 scroll 找到顶部最后一个已划过的 h2 作为激活项。
+    const headingList = Array.from(headings);
+
+    function updateByScroll() {
+      const offset = 100; // 与 header 高度相关的补偿
+      let current = null;
+      for (const h of headingList) {
+        if (h.getBoundingClientRect().top - offset <= 0) {
+          current = h.id;
+        } else {
           break;
         }
       }
-      if (parentH2) {
-        h3ToH2Map.set(h3.getAttribute("id"), parentH2.getAttribute("id"));
-      }
-    });
-
-    /**
-     * @param {string | null} activeId
-     */
-    function updateActiveLink(activeId) {
-      const resolvedId = h3ToH2Map.get(activeId) || activeId;
-
-      /** @param {NodeListOf<HTMLAnchorElement>} links */
-      const updateLinks = (links) => {
-        links.forEach((link) => {
-          const href = link.getAttribute("href");
-          const isActive = href === `#${resolvedId}`;
-
-          if (isActive) {
-            link.classList.remove("text-muted");
-            link.classList.add("text-fg", "dark:text-fg-invert", "font-semibold");
-          } else {
-            link.classList.add("text-muted");
-            link.classList.remove("text-fg", "dark:text-fg-invert", "font-semibold");
-          }
-        });
-      };
-
-      updateLinks(tocLinks);
-      updateLinks(tocLinksMobile);
+      // 文章还没滚到第一个标题前，先不激活
+      setActive(current);
     }
 
     observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
+        // 仅保留当前正进入视口的标题，但完全依赖 IO 在快速滚动时可能滞后，
+        // 因此刷新一次 scroll 计算作为权威源。
+        updateByScroll();
+        // 触发结束后让 IO 也参与（避免 scroll 漏掉刚 enter 的）
+        for (const entry of entries) {
           if (entry.isIntersecting) {
-            const id = entry.target.getAttribute("id");
-            updateActiveLink(id);
+            setActive(entry.target.id);
           }
-        });
+        }
       },
       {
         rootMargin: "-80px 0px -70% 0px",
-        threshold: 0,
+        threshold: [0, 0.25, 0.5, 1],
       },
     );
 
     headings.forEach((heading) => observer.observe(heading));
 
+    // scroll 作为 IO 兜底：节流到 rAF
+    let scrollRaf = 0;
+    const onScroll = () => {
+      if (scrollRaf) return;
+      scrollRaf = requestAnimationFrame(() => {
+        scrollRaf = 0;
+        updateByScroll();
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    cleanupFns.push(() => {
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      window.removeEventListener("scroll", onScroll);
+    });
+
+    // 初始化一次
+    updateByScroll();
+
+    // —— 移动端抽屉 ——
     const mobileContainers = document.querySelectorAll(".toc-mobile-container");
 
     mobileContainers.forEach(container => {
       const mobileBtn = container.querySelector(".toc-mobile-btn");
       const drawer = container.querySelector(".toc-drawer");
-      const overlay = container.querySelector(".toc-overlay");
+      const overlay = container.querySelector("[data-toc-overlay]");
       const closeBtn = container.querySelector(".toc-close-btn");
       const links = container.querySelectorAll(".toc-link-mobile");
+
+      /** 抽屉内可聚焦元素，用于焦点陷阱 @type {HTMLElement[]} */
+      const focusables = Array.from(
+        drawer
+          ? drawer.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])')
+          : []
+      ).filter((el) => el instanceof HTMLElement);
 
       function openDrawer() {
         drawer?.classList.remove("translate-y-full");
@@ -242,6 +304,9 @@ const tocItems = headings.filter((h) => h.depth === 2);
         overlay?.classList.remove("opacity-0", "pointer-events-none");
         overlay?.classList.add("opacity-100", "pointer-events-auto");
         document.body.style.overflow = "hidden";
+        if (mobileBtn) mobileBtn.setAttribute("aria-expanded", "true");
+        // 进入焦点：优先第一个链接，便于键盘连续跳转
+        if (focusables.length > 0) focusables[0].focus();
       }
 
       function closeDrawer() {
@@ -250,6 +315,31 @@ const tocItems = headings.filter((h) => h.depth === 2);
         overlay?.classList.add("opacity-0", "pointer-events-none");
         overlay?.classList.remove("opacity-100", "pointer-events-auto");
         document.body.style.overflow = "";
+        if (mobileBtn) mobileBtn.setAttribute("aria-expanded", "false");
+        // 关闭后焦点回到触发按钮，符合 a11y 模式
+        if (mobileBtn instanceof HTMLElement) mobileBtn.focus();
+      }
+
+      /** @param {KeyboardEvent} e */
+      function drawerKeyHandler(e) {
+        if (e.key === "Escape") {
+          e.preventDefault();
+          closeDrawer();
+          return;
+        }
+        if (e.key === "Tab" && focusables.length > 0) {
+          // 简单焦点陷阱：在第一个/最后一个之间循环
+          const first = focusables[0];
+          const last = focusables[focusables.length - 1];
+          const active = document.activeElement;
+          if (e.shiftKey && active === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && active === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
       }
 
       /** @param {MouseEvent} e */
@@ -261,42 +351,27 @@ const tocItems = headings.filter((h) => h.depth === 2);
       const closeHandler = () => closeDrawer();
 
       /** @param {MouseEvent} e */
-      const linkClickHandler = (e) => {
+      const mobileLinkClickHandler = (e) => {
         const link = /** @type {HTMLAnchorElement} */ (e.currentTarget);
-        e.preventDefault();
-        closeDrawer();
-
-        const href = link.getAttribute("href");
-        const targetId = href ? href.substring(1) : null;
-        const target = targetId ? document.getElementById(targetId) : null;
-
-        if (target) {
-          setTimeout(() => {
-            target.scrollIntoView({
-              behavior: "smooth",
-              block: "start"
-            });
-            if (href) {
-              history.replaceState(null, "", href);
-            }
-          }, 50);
-        }
+        linkClickHandler(e, link, closeDrawer);
       };
 
       mobileBtn?.addEventListener("click", openHandler);
       closeBtn?.addEventListener("click", closeHandler);
       overlay?.addEventListener("click", closeHandler);
+      drawer?.addEventListener("keydown", drawerKeyHandler);
 
       links.forEach(link => {
-        link.addEventListener("click", linkClickHandler);
+        link.addEventListener("click", mobileLinkClickHandler);
       });
 
       cleanupFns.push(() => {
         mobileBtn?.removeEventListener("click", openHandler);
         closeBtn?.removeEventListener("click", closeHandler);
         overlay?.removeEventListener("click", closeHandler);
+        drawer?.removeEventListener("keydown", drawerKeyHandler);
         links.forEach(link => {
-          link.removeEventListener("click", linkClickHandler);
+          link.removeEventListener("click", mobileLinkClickHandler);
         });
       });
     });

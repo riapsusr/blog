@@ -11,10 +11,12 @@ export default {
       colors: {
         // 语义色 —— 集中切换主题与品牌色，避免散落的 black / stone-500 hardcoded
         // 注意：不要使用 `border` 作为键名，会与 Tailwind 的 border 宽度工具类冲突。
-        fg: "rgb(0 0 0)",                // 主前景（亮色模式）
+        // muted / line 用 CSS 变量驱动，亮/暗模式由 global.css 在 `html.dark` 下覆盖变量，
+        // 这样 `text-muted` / `border-line` 在两种模式自动取对应值，无需 `dark:` 前缀。
+        fg: "rgb(0 0 0)",                // 主前景（亮色模式）— 暗色直接用 `fg-invert`
         "fg-invert": "rgb(255 255 255)", // 暗色模式主前景
-        muted: "#78716c",               // 次级文本，对比度 >= 4.5:1
-        line: "rgba(0,0,0,0.10)",        // 分隔线/边框颜色
+        muted: "var(--color-muted, #78716c)",
+        line: "var(--color-line, rgba(0,0,0,0.10))",
       },
       spacing: {
         // 排版节奏：section 16 / block 10 / group 6 / item 4
