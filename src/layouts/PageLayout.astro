@@ -9,24 +9,25 @@ import SpeedInsights from '@vercel/speed-insights/astro';
 type Props = {
   title: string;
   description?: string;
+  publishedTime?: string;
 };
 
-const { title, description = "" } = Astro.props;
+const { title, description = "", publishedTime } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="zh-CN" style="color-scheme: light;">
+<html lang="zh-CN">
   <head>
-    <Head title={`${title} | ${SITE.NAME}`} description={description} />
+    <Head title={`${title} | ${SITE.NAME}`} description={description} publishedTime={publishedTime} />
     <slot name="head" />
   </head>
-    <body class="transition-colors duration-300">
+  <body class="transition-colors duration-300">
     <Header />
     <main>
       <slot />
     </main>
     <Footer />
-    
+
     <Analytics />
     <SpeedInsights />
   </body>

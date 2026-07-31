@@ -13,36 +13,38 @@ const tocItems = headings.filter((h) => h.depth === 2);
   tocItems.length > 0 && (
     <>
       {/* 桌面端：右侧固定目录 */}
-      <nav
-        class="hidden xl:block sticky top-32 w-48 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-hide border border-line rounded-lg p-4"
-        aria-label="目录"
-      >
-        <div class="text-xs font-semibold text-muted mb-3 uppercase tracking-wider">
-          目录
-        </div>
-        <ul class="space-y-2 text-sm">
-          {tocItems.map((item) => (
-            <li
-              class="toc-item transition-all duration-200"
-              data-slug={item.slug}
-            >
-              <a
-                href={`#${item.slug}`}
-                class="toc-link block text-muted hover:text-fg dark:hover:text-fg-invert transition-colors duration-200 leading-relaxed"
+      <div class="hidden xl:block absolute left-full top-0 h-full ml-12">
+        <nav
+          class="sticky top-32 w-48 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-hide border border-line rounded-lg p-4"
+          aria-label="目录"
+        >
+          <div class="text-xs font-semibold text-muted mb-3 uppercase tracking-wider">
+            目录
+          </div>
+          <ul class="space-y-2 text-sm">
+            {tocItems.map((item) => (
+              <li
+                class="toc-item transition-all duration-200"
+                data-slug={item.slug}
               >
-                {item.text}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
+                <a
+                  href={`#${item.slug}`}
+                  class="toc-link block text-muted hover:text-fg dark:hover:text-fg-invert transition-colors duration-200 leading-relaxed"
+                >
+                  {item.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
 
       {/* 移动端：底部悬浮按钮 + 抽屉 */}
       <div class="xl:hidden toc-mobile-container">
         {/* 悬浮按钮 */}
         <button
           type="button"
-          class="toc-mobile-btn fixed bottom-28 right-5 z-40 w-10 h-10 bg-stone-200 dark:bg-stone-800 rounded-sm shadow-lg flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors duration-200"
+          class="toc-mobile-btn fixed bottom-28 right-5 z-40 w-10 h-10 bg-control rounded-sm shadow-lg flex items-center justify-center text-body hover:bg-control-hover transition-colors duration-200"
           aria-label="打开目录"
           aria-expanded="false"
           aria-controls="toc-drawer"
@@ -67,18 +69,22 @@ const tocItems = headings.filter((h) => h.depth === 2);
 
         {/* 遮罩层 */}
         <div
-          class="toc-overlay fixed inset-0 z-40 bg-black/30 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"
+          class="toc-overlay fixed inset-0 z-40 bg-overlay backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"
           data-toc-overlay
         />
 
         {/* 抽屉 */}
-        <nav
+        <div
           id="toc-drawer"
-          class="toc-drawer fixed bottom-0 left-0 right-0 z-50 bg-stone-100 dark:bg-stone-900 rounded-t-sm shadow-2xl transform translate-y-full transition-transform duration-300 ease-out max-h-[60vh] overflow-hidden"
-          aria-label="目录"
+          class="toc-drawer fixed bottom-0 left-0 right-0 z-50 bg-surface-raised rounded-t-sm shadow-2xl transform translate-y-full transition-transform duration-300 ease-out max-h-[60vh] overflow-hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="toc-drawer-title"
+          aria-hidden="true"
+          inert
         >
           <div class="flex items-center justify-between px-5 py-4 border-b border-line">
-            <span class="text-sm font-semibold text-muted">
+            <span id="toc-drawer-title" class="text-sm font-semibold text-muted">
               目录
             </span>
             <button
@@ -103,22 +109,24 @@ const tocItems = headings.filter((h) => h.depth === 2);
               </svg>
             </button>
           </div>
-          <ul class="p-5 space-y-3 overflow-y-auto scrollbar-hide max-h-[calc(60vh-60px)]">
-            {tocItems.map((item) => (
-              <li
-                class="toc-item-mobile transition-all duration-200"
-                data-slug={item.slug}
-              >
-                <a
-                  href={`#${item.slug}`}
-                  class="toc-link-mobile block text-muted hover:text-fg dark:hover:text-fg-invert transition-colors duration-200 py-1"
+          <nav aria-label="目录">
+            <ul class="p-5 space-y-3 overflow-y-auto scrollbar-hide max-h-[calc(60vh-60px)]">
+              {tocItems.map((item) => (
+                <li
+                  class="toc-item-mobile transition-all duration-200"
+                  data-slug={item.slug}
                 >
-                  {item.text}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+                  <a
+                    href={`#${item.slug}`}
+                    class="toc-link-mobile block text-muted hover:text-fg dark:hover:text-fg-invert transition-colors duration-200 py-1"
+                  >
+                    {item.text}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
       </div>
     </>
   )
@@ -282,97 +290,102 @@ const tocItems = headings.filter((h) => h.depth === 2);
     updateByScroll();
 
     // —— 移动端抽屉 ——
-    const mobileContainers = document.querySelectorAll(".toc-mobile-container");
+    const mobileContainer = document.querySelector(".toc-mobile-container");
+    if (!mobileContainer) {
+      window.__tocCleanup__ = cleanup;
+      return;
+    }
 
-    mobileContainers.forEach(container => {
-      const mobileBtn = container.querySelector(".toc-mobile-btn");
-      const drawer = container.querySelector(".toc-drawer");
-      const overlay = container.querySelector("[data-toc-overlay]");
-      const closeBtn = container.querySelector(".toc-close-btn");
-      const links = container.querySelectorAll(".toc-link-mobile");
+    const mobileBtn = mobileContainer.querySelector(".toc-mobile-btn");
+    const drawer = mobileContainer.querySelector(".toc-drawer");
+    const overlay = mobileContainer.querySelector("[data-toc-overlay]");
+    const closeBtn = mobileContainer.querySelector(".toc-close-btn");
+    const links = mobileContainer.querySelectorAll(".toc-link-mobile");
 
-      /** 抽屉内可聚焦元素，用于焦点陷阱 @type {HTMLElement[]} */
-      const focusables = Array.from(
-        drawer
-          ? drawer.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])')
-          : []
-      ).filter((el) => el instanceof HTMLElement);
+    /** 抽屉内可聚焦元素，用于焦点陷阱 @type {HTMLElement[]} */
+    const focusables = Array.from(
+      drawer
+        ? drawer.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])')
+        : []
+    ).filter((el) => el instanceof HTMLElement);
 
-      function openDrawer() {
-        drawer?.classList.remove("translate-y-full");
-        drawer?.classList.add("translate-y-0");
-        overlay?.classList.remove("opacity-0", "pointer-events-none");
-        overlay?.classList.add("opacity-100", "pointer-events-auto");
-        document.body.style.overflow = "hidden";
-        if (mobileBtn) mobileBtn.setAttribute("aria-expanded", "true");
-        // 进入焦点：优先第一个链接，便于键盘连续跳转
-        if (focusables.length > 0) focusables[0].focus();
+    function openDrawer() {
+      drawer?.removeAttribute("inert");
+      drawer?.setAttribute("aria-hidden", "false");
+      drawer?.classList.remove("translate-y-full");
+      drawer?.classList.add("translate-y-0");
+      overlay?.classList.remove("opacity-0", "pointer-events-none");
+      overlay?.classList.add("opacity-100", "pointer-events-auto");
+      document.body.style.overflow = "hidden";
+      if (mobileBtn) mobileBtn.setAttribute("aria-expanded", "true");
+      if (closeBtn instanceof HTMLElement) closeBtn.focus();
+    }
+
+    function closeDrawer({ restoreFocus = true } = {}) {
+      drawer?.setAttribute("inert", "");
+      drawer?.setAttribute("aria-hidden", "true");
+      drawer?.classList.add("translate-y-full");
+      drawer?.classList.remove("translate-y-0");
+      overlay?.classList.add("opacity-0", "pointer-events-none");
+      overlay?.classList.remove("opacity-100", "pointer-events-auto");
+      document.body.style.overflow = "";
+      if (mobileBtn) mobileBtn.setAttribute("aria-expanded", "false");
+      if (restoreFocus && mobileBtn instanceof HTMLElement) mobileBtn.focus();
+    }
+
+    /** @param {KeyboardEvent} e */
+    function drawerKeyHandler(e) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeDrawer();
+        return;
       }
-
-      function closeDrawer() {
-        drawer?.classList.add("translate-y-full");
-        drawer?.classList.remove("translate-y-0");
-        overlay?.classList.add("opacity-0", "pointer-events-none");
-        overlay?.classList.remove("opacity-100", "pointer-events-auto");
-        document.body.style.overflow = "";
-        if (mobileBtn) mobileBtn.setAttribute("aria-expanded", "false");
-        // 关闭后焦点回到触发按钮，符合 a11y 模式
-        if (mobileBtn instanceof HTMLElement) mobileBtn.focus();
-      }
-
-      /** @param {KeyboardEvent} e */
-      function drawerKeyHandler(e) {
-        if (e.key === "Escape") {
+      if (e.key === "Tab" && focusables.length > 0) {
+        // 简单焦点陷阱：在第一个/最后一个之间循环
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const active = document.activeElement;
+        if (e.shiftKey && active === first) {
           e.preventDefault();
-          closeDrawer();
-          return;
-        }
-        if (e.key === "Tab" && focusables.length > 0) {
-          // 简单焦点陷阱：在第一个/最后一个之间循环
-          const first = focusables[0];
-          const last = focusables[focusables.length - 1];
-          const active = document.activeElement;
-          if (e.shiftKey && active === first) {
-            e.preventDefault();
-            last.focus();
-          } else if (!e.shiftKey && active === last) {
-            e.preventDefault();
-            first.focus();
-          }
+          last.focus();
+        } else if (!e.shiftKey && active === last) {
+          e.preventDefault();
+          first.focus();
         }
       }
+    }
 
-      /** @param {MouseEvent} e */
-      const openHandler = (e) => {
-        e.stopPropagation();
-        openDrawer();
-      };
+    /** @param {MouseEvent} e */
+    const openHandler = (e) => {
+      e.stopPropagation();
+      openDrawer();
+    };
 
-      const closeHandler = () => closeDrawer();
+    const closeHandler = () => closeDrawer();
 
-      /** @param {MouseEvent} e */
-      const mobileLinkClickHandler = (e) => {
-        const link = /** @type {HTMLAnchorElement} */ (e.currentTarget);
-        linkClickHandler(e, link, closeDrawer);
-      };
+    /** @param {MouseEvent} e */
+    const mobileLinkClickHandler = (e) => {
+      const link = /** @type {HTMLAnchorElement} */ (e.currentTarget);
+      linkClickHandler(e, link, closeDrawer);
+    };
 
-      mobileBtn?.addEventListener("click", openHandler);
-      closeBtn?.addEventListener("click", closeHandler);
-      overlay?.addEventListener("click", closeHandler);
-      drawer?.addEventListener("keydown", drawerKeyHandler);
+    mobileBtn?.addEventListener("click", openHandler);
+    closeBtn?.addEventListener("click", closeHandler);
+    overlay?.addEventListener("click", closeHandler);
+    drawer?.addEventListener("keydown", drawerKeyHandler);
 
+    links.forEach(link => {
+      link.addEventListener("click", mobileLinkClickHandler);
+    });
+
+    cleanupFns.push(() => {
+      closeDrawer({ restoreFocus: false });
+      mobileBtn?.removeEventListener("click", openHandler);
+      closeBtn?.removeEventListener("click", closeHandler);
+      overlay?.removeEventListener("click", closeHandler);
+      drawer?.removeEventListener("keydown", drawerKeyHandler);
       links.forEach(link => {
-        link.addEventListener("click", mobileLinkClickHandler);
-      });
-
-      cleanupFns.push(() => {
-        mobileBtn?.removeEventListener("click", openHandler);
-        closeBtn?.removeEventListener("click", closeHandler);
-        overlay?.removeEventListener("click", closeHandler);
-        drawer?.removeEventListener("keydown", drawerKeyHandler);
-        links.forEach(link => {
-          link.removeEventListener("click", mobileLinkClickHandler);
-        });
+        link.removeEventListener("click", mobileLinkClickHandler);
       });
     });
 

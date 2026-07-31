@@ -1,0 +1,89 @@
+---
+import type { CollectionEntry } from "astro:content";
+import ArrowCard from "@components/ArrowCard.astro";
+import { getPostCategoryURL } from "@lib/utils";
+
+interface Props {
+  posts: CollectionEntry<"posts">[];
+  activeCategory?: string;
+}
+
+const { posts, activeCategory } = Astro.props;
+
+const categoryCounts = posts.reduce((counts, post) => {
+  const { category } = post.data;
+  counts[category] = (counts[category] ?? 0) + 1;
+  return counts;
+}, {} as Record<string, number>);
+
+const categories = Object.keys(categoryCounts).sort(
+  (a, b) => categoryCounts[b] - categoryCounts[a] || a.localeCompare(b, "zh-CN"),
+);
+
+const visiblePosts = activeCategory
+  ? posts.filter((post) => post.data.category === activeCategory)
+  : posts;
+
+const postsByYear = visiblePosts.reduce((groups, post) => {
+  const year = post.data.date.slice(0, 4);
+  (groups[year] ??= []).push(post);
+  return groups;
+}, {} as Record<string, CollectionEntry<"posts">[]>);
+
+const years = Object.keys(postsByYear).sort((a, b) => b.localeCompare(a));
+const filterButtonClass = "px-3 py-1 rounded-full transition-colors duration-200 border";
+const activeFilterClass = "bg-fg text-fg-invert border-fg dark:bg-fg-invert dark:text-fg dark:border-fg-invert";
+const inactiveFilterClass = "text-muted border-transparent hover:bg-surface-hover";
+---
+
+<div class="space-y-10">
+  <div class="flex flex-col gap-4">
+    <h1 class="font-semibold text-fg dark:text-fg-invert text-xl">文章</h1>
+
+    <nav class="flex flex-wrap gap-2 text-sm" aria-label="文章分类">
+      <a
+        href={getPostCategoryURL()}
+        class:list={[filterButtonClass, !activeCategory ? activeFilterClass : inactiveFilterClass]}
+        aria-current={!activeCategory ? "page" : undefined}
+      >
+        全部
+      </a>
+      {categories.map((category) => (
+        <a
+          href={getPostCategoryURL(category)}
+          class:list={[filterButtonClass, activeCategory === category ? activeFilterClass : inactiveFilterClass]}
+          aria-current={activeCategory === category ? "page" : undefined}
+        >
+          {category}
+        </a>
+      ))}
+    </nav>
+  </div>
+
+  {years.length > 0 ? (
+    <div class="flex flex-col gap-12">
+      {years.map((year) => (
+        <section class="space-y-4" aria-labelledby={`year-${year}`}>
+          <h2 id={`year-${year}`} class="font-semibold text-fg dark:text-fg-invert pt-2 text-lg">
+            {year}
+          </h2>
+          <ul class="flex flex-col gap-0">
+            {postsByYear[year].map((post, index, entries) => (
+              <li>
+                <ArrowCard
+                  entry={post}
+                  class:list={[
+                    index === 0 && "rounded-t-lg",
+                    index === entries.length - 1 && "rounded-b-lg border-b-0",
+                  ]}
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  ) : (
+    <p class="text-muted py-10 text-center">该分类下暂无文章</p>
+  )}
+</div>

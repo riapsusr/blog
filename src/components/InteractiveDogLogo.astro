@@ -85,15 +85,12 @@
 </svg>
 
 <script>
-  // 1.5 统一 guard 模式：每次 init 前先收尾上一次。
-  declare global {
-    interface Window {
-      __cleanupDogLogo__?: () => void;
-    }
-  }
+  // 统一 guard 模式：每次 init 前先收尾上一次（未来启用 View Transitions 时复用）。
   if (window.__cleanupDogLogo__) {
     try { window.__cleanupDogLogo__(); } catch { /* ignore */ }
   }
+
+  const cleanups: (() => void)[] = [];
 
   const initDogLogos = () => {
     const logos = document.querySelectorAll<SVGSVGElement>("[data-dog-logo]");
@@ -125,8 +122,44 @@
         element?.setAttribute("cy", y.toFixed(2));
       };
 
+      const resetPose = () => {
+        head?.removeAttribute("transform");
+        face?.removeAttribute("transform");
+        leftEar?.removeAttribute("transform");
+        rightEar?.removeAttribute("transform");
+        leftEye?.setAttribute("ry", "7.5");
+        rightEye?.setAttribute("ry", "7.5");
+        setEllipsePosition(leftEye, 70, 78);
+        setEllipsePosition(rightEye, 110, 78);
+        leftShine?.setAttribute("opacity", "1");
+        rightShine?.setAttribute("opacity", "1");
+        setCirclePosition(leftShine, 72, 75);
+        setCirclePosition(rightShine, 112, 75);
+        setEllipsePosition(leftCheek, 59, 98);
+        setEllipsePosition(rightCheek, 121, 98);
+      };
+
+      // prefers-reduced-motion：不做任何动画，仅保留可清理的 ready 标记。
+      if (prefersReducedMotion) {
+        cleanups.push(() => logo.removeAttribute("data-ready"));
+        return;
+      }
+
+      // logo 位于固定 Header，位置只在初始化与 resize 时变化；
+      // 缓存 rect，避免每次 pointermove 都读布局。
+      let rect = logo.getBoundingClientRect();
+      const updateRect = () => { rect = logo.getBoundingClientRect(); };
+      window.addEventListener("resize", updateRect, { passive: true });
+
+      // 仅当指针位于 logo 周边合理范围内才更新姿态；离开范围只重置一次。
+      const PROXIMITY = 320;
+      const inRange = (clientX: number, clientY: number) =>
+        clientX >= rect.left - PROXIMITY && clientX <= rect.right + PROXIMITY &&
+        clientY >= rect.top - PROXIMITY && clientY <= rect.bottom + PROXIMITY;
+
+      let poseActive = false;
+
       const move = (clientX: number, clientY: number) => {
-        const rect = logo.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
         const offsetX = clientX - centerX;
@@ -153,16 +186,30 @@
         setEllipsePosition(rightCheek, 121 + headX * 0.34, 98 + headY * 0.24);
       };
 
-      if (prefersReducedMotion) return;
-
       let nextFrame = 0;
       const handlePointerMove = (event: PointerEvent) => {
+        if (!inRange(event.clientX, event.clientY)) {
+          if (poseActive) {
+            poseActive = false;
+            resetPose();
+          }
+          return;
+        }
+        poseActive = true;
         window.cancelAnimationFrame(nextFrame);
         nextFrame = window.requestAnimationFrame(() => move(event.clientX, event.clientY));
       };
 
       let blinkTimer: ReturnType<typeof setTimeout> | null = null;
       let resumeTimer: ReturnType<typeof setTimeout> | null = null;
+      let restoreEyeTimer: ReturnType<typeof setTimeout> | null = null;
+
+      const restoreEyes = () => {
+        leftEye?.setAttribute("ry", "7.5");
+        rightEye?.setAttribute("ry", "7.5");
+        leftShine?.setAttribute("opacity", "1");
+        rightShine?.setAttribute("opacity", "1");
+      };
 
       const blink = () => {
         if (document.hidden) {
@@ -175,38 +222,63 @@
         leftShine?.setAttribute("opacity", "0");
         rightShine?.setAttribute("opacity", "0");
 
-        setTimeout(() => {
-          leftEye?.setAttribute("ry", "7.5");
-          rightEye?.setAttribute("ry", "7.5");
-          leftShine?.setAttribute("opacity", "1");
-          rightShine?.setAttribute("opacity", "1");
-        }, 150);
+        restoreEyeTimer = setTimeout(restoreEyes, 150);
 
         blinkTimer = setTimeout(blink, Math.random() * 3200 + 2200);
       };
 
-      document.addEventListener("visibilitychange", () => {
+      const handleVisibilityChange = () => {
         if (document.hidden) {
           if (blinkTimer) { clearTimeout(blinkTimer); blinkTimer = null; }
           if (resumeTimer) { clearTimeout(resumeTimer); resumeTimer = null; }
+          if (restoreEyeTimer) { clearTimeout(restoreEyeTimer); restoreEyeTimer = null; }
         } else {
           if (!blinkTimer && !resumeTimer) {
             blinkTimer = setTimeout(blink, Math.random() * 1000 + 500);
           }
         }
-      });
+      };
 
       window.addEventListener("pointermove", handlePointerMove, { passive: true });
+      window.addEventListener("resize", updateRect, { passive: true });
+      document.addEventListener("visibilitychange", handleVisibilityChange);
       blinkTimer = setTimeout(blink, Math.random() * 1800 + 1200);
+
+      cleanups.push(() => {
+        window.removeEventListener("pointermove", handlePointerMove);
+        window.removeEventListener("resize", updateRect);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+        if (nextFrame) window.cancelAnimationFrame(nextFrame);
+        if (blinkTimer) { clearTimeout(blinkTimer); blinkTimer = null; }
+        if (resumeTimer) { clearTimeout(resumeTimer); resumeTimer = null; }
+        if (restoreEyeTimer) { clearTimeout(restoreEyeTimer); restoreEyeTimer = null; }
+        resetPose();
+        logo.removeAttribute("data-ready");
+      });
     });
   };
 
+  let domReadyHandler: (() => void) | null = null;
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initDogLogos, { once: true });
+    domReadyHandler = () => {
+      domReadyHandler = null;
+      initDogLogos();
+    };
+    document.addEventListener("DOMContentLoaded", domReadyHandler, { once: true });
   } else {
     initDogLogos();
   }
 
-  // 该脚本仅用 dataset.ready 自查防止重复初始化，cleanup 占位以便统一生命周期。
-  window.__cleanupDogLogo__ = () => { /* 单次初始化、无监听需要} */ };
+  window.__cleanupDogLogo__ = () => {
+    // 若 DOMContentLoaded 尚未触发，也要移除其回调。
+    if (domReadyHandler) {
+      document.removeEventListener("DOMContentLoaded", domReadyHandler);
+      domReadyHandler = null;
+    }
+    while (cleanups.length > 0) {
+      const fn = cleanups.pop();
+      if (!fn) continue;
+      try { fn(); } catch { /* ignore cleanup errors */ }
+    }
+  };
 </script>

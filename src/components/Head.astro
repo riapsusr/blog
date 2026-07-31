@@ -6,10 +6,13 @@ interface Props {
   title: string;
   description: string;
   image?: string;
+  publishedTime?: string;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const { title, description, image = "/favicon.svg" } = Astro.props;
+const { title, description, image = "/og-default.png", publishedTime } = Astro.props;
+const imageURL = new URL(image, Astro.url);
+const isArticle = publishedTime !== undefined;
 ---
 
 <meta charset="utf-8" />
@@ -26,18 +29,22 @@ const { title, description, image = "/favicon.svg" } = Astro.props;
 <meta name="title" content={title} />
 <meta name="description" content={description} />
 
-<meta property="og:type" content="website" />
+<meta property="og:type" content={isArticle ? "article" : "website"} />
 <meta property="og:url" content={Astro.url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content={new URL(image, Astro.url)} />
+<meta property="og:image" content={imageURL} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:type" content="image/png" />
 <meta property="og:locale" content="zh_CN" />
 <meta property="og:site_name" content={SITE.NAME} />
-<meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content={Astro.url} />
-<meta property="twitter:title" content={title} />
-<meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={new URL(image, Astro.url)} />
+{isArticle && <meta property="article:published_time" content={`${publishedTime}T00:00:00.000Z`} />}
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content={Astro.url} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageURL} />
 
 <link rel="alternate" type="application/rss+xml" title={SITE.NAME} href={new URL("rss.xml", Astro.site)} />
 
@@ -65,8 +72,6 @@ NOTE: View Transitions 当前已禁用
     const isDark = theme === "dark";
     const root = document.documentElement;
     root.classList.toggle("dark", isDark);
-    // 同步 color-scheme 给浏览器表单控件/滚动条使用，减少首帧闪烁
-    root.style.colorScheme = isDark ? "dark" : "light";
   }
 
   applyTheme();

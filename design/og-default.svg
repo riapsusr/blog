@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <style>
+      .title {
+        font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+        font-size: 68px;
+        font-weight: 600;
+        fill: #1f1715;
+      }
+      .subtitle {
+        font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+        font-size: 30px;
+        font-weight: 400;
+        fill: #a8a29e;
+        letter-spacing: 4px;
+      }
+    </style>
+  </defs>
+
+  <!-- 暖白背景 -->
+  <rect width="1200" height="630" fill="#fafaf9" />
+
+  <!-- 中央卡片 -->
+  <rect x="330" y="70" width="540" height="490" rx="28" fill="#ffffff" stroke="#e7e5e4" stroke-width="2" />
+
+  <!-- 狗 logo（与 favicon 同源的抽象元素，品牌绘制色保留） -->
+  <g transform="translate(481 33) scale(2.2)">
+    <path d="M47 71C42 56 43 38 52 27C66 29 77 44 80 66Z" fill="#e8b67c" stroke="#1f1715" stroke-width="5.5" stroke-linejoin="round" />
+    <path d="M133 71C138 56 137 38 128 27C114 29 103 44 100 66Z" fill="#e8b67c" stroke="#1f1715" stroke-width="5.5" stroke-linejoin="round" />
+    <path d="M56 59C53 48 54 39 58 34C66 39 72 50 74 61Z" fill="#f8ecd9" />
+    <path d="M124 59C127 48 126 39 122 34C114 39 108 50 106 61Z" fill="#f8ecd9" />
+
+    <path d="M36 80C36 60 56 50 90 50C124 50 144 60 144 80C144 108 122 128 90 128C58 128 36 108 36 80Z" fill="#e8b67c" />
+    <path d="M69 54C81 49 99 49 111 54M49 66C41 72 36 82 36 94C37 116 59 128 90 128C121 128 143 116 144 94C144 82 139 72 131 66" fill="none" stroke="#1f1715" stroke-width="5.5" stroke-linecap="round" />
+    <path d="M51 94C58 83 74 83 90 97C106 83 122 83 129 94C126 117 109 128 90 128C71 128 54 117 51 94Z" fill="#f8ecd9" />
+    <ellipse cx="59" cy="98" rx="14" ry="9" fill="#e79b93" opacity="0.78" />
+    <ellipse cx="121" cy="98" rx="14" ry="9" fill="#e79b93" opacity="0.78" />
+
+    <path d="M56 121C72 133 108 133 124 121" fill="none" stroke="#1f1715" stroke-width="13" stroke-linecap="round" />
+    <path d="M56 121C72 133 108 133 124 121" fill="none" stroke="#a85a60" stroke-width="8" stroke-linecap="round" />
+    <circle cx="90" cy="127" r="10.5" fill="#e6cf63" stroke="#1f1715" stroke-width="4.5" />
+    <path d="M83.5 124H96.5" stroke="#1f1715" stroke-width="3.2" stroke-linecap="round" />
+    <path d="M90 129V134.5" stroke="#1f1715" stroke-width="3.2" stroke-linecap="round" />
+
+    <ellipse cx="70" cy="78" rx="6.5" ry="7.5" fill="#1f1715" />
+    <ellipse cx="110" cy="78" rx="6.5" ry="7.5" fill="#1f1715" />
+    <circle cx="72" cy="75" r="2" fill="#ffffff" />
+    <circle cx="112" cy="75" r="2" fill="#ffffff" />
+    <path d="M82 90C82 84 87 81 90 81C93 81 98 84 98 90C98 95 94 98 90 98C86 98 82 95 82 90Z" fill="#1f1715" />
+    <path d="M90 98C86 105 80 107 75 103M90 98C94 105 100 107 105 103" fill="none" stroke="#1f1715" stroke-width="4" stroke-linecap="round" />
+  </g>
+
+  <!-- 站点名 -->
+  <text class="title" x="600" y="452" text-anchor="middle">Syu's Blog</text>
+  <text class="subtitle" x="600" y="508" text-anchor="middle">199623.xyz</text>
+</svg>

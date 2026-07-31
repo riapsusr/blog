@@ -2,8 +2,9 @@ import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import astroPlugin from "eslint-plugin-astro";
 import jsxA11y from "eslint-plugin-jsx-a11y";
+import { defineConfig } from "eslint/config";
 
-export default tseslint.config(
+export default defineConfig(
   {
     ignores: ["dist/", ".astro/", "node_modules/", ".vscode/", "public/", ".worktrees/"],
   },

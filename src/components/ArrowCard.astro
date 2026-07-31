@@ -14,7 +14,7 @@ const excerpt = getPostExcerpt(entry.body);
 <a 
   href={href}
   class:list={[
-    "relative group flex flex-nowrap py-4 px-3 -mx-3 items-center gap-4 transition-all duration-300 border-b border-black/5 dark:border-white/5 hover:bg-black/[0.12] dark:hover:bg-white/[0.15] -mb-[1px] shadow-none",
+    "relative group flex flex-nowrap py-4 px-3 -mx-3 items-center gap-4 transition-all duration-300 border-b border-line-soft hover:bg-surface-hover -mb-[1px] shadow-none",
     className
   ]}
 >
@@ -23,10 +23,10 @@ const excerpt = getPostExcerpt(entry.body);
   </div>
 
   <div class="flex flex-col flex-1 truncate">
-    <div class="font-medium text-stone-700 dark:text-stone-200 group-hover:text-fg dark:group-hover:text-fg-invert transition-colors duration-300 text-base">
+    <div class="font-medium text-body group-hover:text-fg dark:group-hover:text-fg-invert transition-colors duration-300 text-base">
       {entry.data.title}
     </div>
-    <div class="text-sm text-muted truncate mt-1">
+    <div class="text-sm text-muted truncate mt-1" title={excerpt}>
       {excerpt}
     </div>
   </div>

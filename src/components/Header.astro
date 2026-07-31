@@ -6,16 +6,13 @@ import { SITE, NAV_ITEMS } from "@consts";
 
 const { pathname } = Astro.url;
 
+const isActivePath = (path: string) => {
+  if (path === "/") return pathname === "/";
+  return pathname === path || pathname.startsWith(path + "/");
+};
+
 const activeClass = (path: string) => {
-  let isActive: boolean;
-  if (path === "/") {
-    isActive = pathname === "/";
-  } else {
-    isActive = pathname === path
-      || pathname.startsWith(path + "/")
-      || pathname.startsWith(path + "?")
-      || pathname.startsWith(path + "#");
-  }
+  const isActive = isActivePath(path);
   return isActive
     ? "text-fg dark:text-fg-invert font-semibold"
     : "text-muted hover:text-fg dark:hover:text-fg-invert transition-colors";
@@ -33,7 +30,7 @@ const activeClass = (path: string) => {
 
       <nav class="flex gap-1 sm:gap-2 text-sm items-center" aria-label="主导航">
         {NAV_ITEMS.map((item) => (
-          <Link href={item.path} underline={false}>
+          <Link href={item.path} underline={false} aria-current={isActivePath(item.path) ? "page" : undefined}>
             <span class:list={["px-2 py-1.5 rounded-sm text-center block", activeClass(item.path)]}>
               {item.label}
             </span>

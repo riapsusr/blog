@@ -1,6 +1,6 @@
 ---
 import { type CollectionEntry, render } from "astro:content";
-import { getPublishedPosts, getPostSlug, getPostExcerpt } from "@lib/utils";
+import { getPostCategoryURL, getPublishedPosts, getPostSlug, getPostExcerpt } from "@lib/utils";
 import PageLayout from "@layouts/PageLayout.astro";
 import Container from "@components/Container.astro";
 import FormattedDate from "@components/FormattedDate.astro";
@@ -20,7 +20,7 @@ const { Content, headings } = await render(post);
 const description = getPostExcerpt(post.body, 160);
 ---
 
-<PageLayout title={post.data.title} description={description}>
+<PageLayout title={post.data.title} description={description} publishedTime={post.data.date}>
   <Container>
     <div class="relative">
       <div class="space-y-4 mt-8 mb-12">
@@ -31,7 +31,7 @@ const description = getPostExcerpt(post.body, 160);
           <FormattedDate date={post.data.date} />
           <span aria-hidden="true">&bull;</span>
           <a 
-              href={`/posts?category=${encodeURIComponent(post.data.category)}`}
+              href={getPostCategoryURL(post.data.category)}
               class="hover:text-fg dark:hover:text-fg-invert underline underline-offset-2 transition-colors"
           >
               {post.data.category}
@@ -39,31 +39,10 @@ const description = getPostExcerpt(post.body, 160);
         </div>
       </div>
       <article data-pagefind-body>
+        <span class="sr-only" data-pagefind-filter="category">{post.data.category}</span>
         <Content />
       </article>
-      <div class="hidden xl:block absolute left-full top-0 h-full ml-12">
-         <TableOfContents headings={headings} />
-      </div>
+      <TableOfContents headings={headings} />
     </div>
   </Container>
-  <div class="xl:hidden">
-    <TableOfContents headings={headings} />
-  </div>
-  <script is:inline>
-    (function () {
-      function setupImages() {
-        const images = document.querySelectorAll("article img");
-        images.forEach((img) => {
-          img.setAttribute("loading", "lazy");
-          img.setAttribute("decoding", "async");
-        });
-      }
-
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", setupImages, { once: true });
-      } else {
-        setupImages();
-      }
-    })();
-  </script>
 </PageLayout>

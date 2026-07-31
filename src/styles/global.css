@@ -3,18 +3,46 @@
 @tailwind utilities;
 
 /* ----------------------------------------------------------------
-   0. 语义色 CSS 变量（配合 tailwind.config.mjs 的 muted / line token）
-   亮色为默认值，暗色在 `html.dark` 下覆盖。
-   fg / fg-invert 无需变量，它们本身即模式切换值。
+   0. 语义色 CSS 变量（配合 tailwind.config.mjs）
 ---------------------------------------------------------------- */
 @layer base {
   :root {
+    --color-body: #44403c;
     --color-muted: #78716c;
+    --color-surface: #ffffff;
+    --color-surface-raised: #f5f5f4;
+    --color-surface-hover: #e7e5e4;
+    --color-surface-overlay: rgb(255 255 255 / 0.75);
+    --color-control: #e7e5e4;
+    --color-control-hover: #d6d3d1;
     --color-line: rgba(0, 0, 0, 0.10);
+    --color-line-soft: rgba(0, 0, 0, 0.05);
+    --color-decoration: rgba(0, 0, 0, 0.25);
+    --color-overlay: rgb(0 0 0 / 0.30);
+    --color-accent: rgb(239 68 68 / 0.80);
+    --color-highlight: #fef08a;
+    --color-scrollbar-thumb: rgb(120 120 120 / 0.30);
+    --color-scrollbar-thumb-hover: rgb(100 100 100 / 0.50);
+    --color-scrollbar-thumb-active: rgb(80 80 80 / 0.60);
   }
   html.dark {
+    --color-body: #e7e5e4;
     --color-muted: #a8a29e;
+    --color-surface: #1c1917;
+    --color-surface-raised: #1c1917;
+    --color-surface-hover: #3a3633;
+    --color-surface-overlay: rgb(28 25 23 / 0.25);
+    --color-control: #292524;
+    --color-control-hover: #44403c;
     --color-line: rgba(255, 255, 255, 0.12);
+    --color-line-soft: rgba(255, 255, 255, 0.05);
+    --color-decoration: rgba(255, 255, 255, 0.30);
+    --color-overlay: rgb(0 0 0 / 0.30);
+    --color-accent: rgb(239 68 68 / 0.80);
+    --color-highlight: rgb(234 179 8 / 0.30);
+    --color-scrollbar-thumb: rgb(180 180 180 / 0.30);
+    --color-scrollbar-thumb-hover: rgb(200 200 200 / 0.50);
+    --color-scrollbar-thumb-active: rgb(220 220 220 / 0.60);
   }
 }
 
@@ -23,9 +51,7 @@
 ---------------------------------------------------------------- */
 
 @layer base {
-  *,
-  *::before,
-  *::after {
+  html {
     font-family: "PingFang SC", "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
   }
 
@@ -57,11 +83,11 @@ body {
 }
 
 body {
-  @apply flex flex-col bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-200 antialiased;
+  @apply flex flex-col bg-surface text-body antialiased;
 }
 
 header {
-  @apply fixed top-0 left-0 right-0 z-50 py-5 bg-white/75 dark:bg-stone-900/25 backdrop-blur-sm saturate-200;
+  @apply fixed top-0 left-0 right-0 z-50 py-5 bg-surface-overlay backdrop-blur-sm saturate-200;
 }
 
 main {
@@ -111,15 +137,15 @@ article h3 {
 
 article h2::before {
   content: "";
-  @apply absolute left-0 top-[0.25em] bottom-[0.25em] w-1 bg-red-500/80 dark:bg-red-500/80 rounded-sm;
+  @apply absolute left-0 top-[0.25em] bottom-[0.25em] w-1 bg-accent rounded-sm;
 }
 
 article a {
-  @apply text-current underline underline-offset-4 decoration-black/40 dark:decoration-white/50 transition-all duration-300;
+  @apply text-current underline underline-offset-4 decoration-decoration transition-all duration-300;
 }
 
 article a:hover {
-  @apply text-fg dark:text-fg-invert decoration-black/60 dark:decoration-white/60;
+  @apply text-fg dark:text-fg-invert decoration-fg dark:decoration-fg-invert;
 }
 
 article img {
@@ -155,18 +181,18 @@ article img {
 
 ::-webkit-scrollbar-thumb {
   @apply rounded-full;
-  background: rgba(120, 120, 120, 0.3);
+  background: var(--color-scrollbar-thumb);
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 100, 100, 0.5);
+  background: var(--color-scrollbar-thumb-hover);
   background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:active {
-  background: rgba(80, 80, 80, 0.6);
+  background: var(--color-scrollbar-thumb-active);
   background-clip: padding-box;
 }
 
@@ -176,19 +202,4 @@ article img {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
-}
-
-html.dark ::-webkit-scrollbar-thumb {
-  background: rgba(180, 180, 180, 0.3);
-  background-clip: padding-box;
-}
-
-html.dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(200, 200, 200, 0.5);
-  background-clip: padding-box;
-}
-
-html.dark ::-webkit-scrollbar-thumb:active {
-  background: rgba(220, 220, 220, 0.6);
-  background-clip: padding-box;
 }

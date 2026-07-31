@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import type { CollectionEntry } from "astro:content";
 import rss from "@astrojs/rss";
 import { getPublishedPosts, getPostURL } from "@lib/utils";
 import { SITE, HOME } from "@consts";
@@ -7,49 +8,92 @@ import MarkdownIt from "markdown-it";
 
 const parser = new MarkdownIt();
 
+// 收集正文目录下的图片资源，构建时产出可访问的哈希 URL（如 /_astro/xxx.png）。
+const contentImages = import.meta.glob("/src/content/posts/**/*.{avif,gif,jpeg,jpg,png,webp}", {
+  eager: true,
+  import: "default",
+  query: "?url",
+}) as Record<string, string>;
+
+function getRssImageURL(src: string | undefined, item: CollectionEntry<"posts">, site: URL | string): string | undefined {
+  if (!src) return undefined;
+  // 外链与 data URL 保持原样；绝对路径直接基于站点解析。
+  if (/^(?:https?:|data:)/i.test(src)) return src;
+  if (src.startsWith("/")) return new URL(src, site).href;
+
+  // Markdown 中的相对路径（如 ./images/foo.png）以文章文件为基准解析，
+  // 再到构建资源表里找到最终 URL。
+  const sourcePath = new URL(
+    src,
+    `file:///src/content/${item.collection}/${item.id}`,
+  ).pathname;
+  const outputPath = contentImages[sourcePath];
+
+  return outputPath ? new URL(outputPath, site).href : undefined;
+}
+
+function getRssLinkURL(href: string | undefined, item: CollectionEntry<"posts">, site: URL | string): string | undefined {
+  // 外链、锚点等保持原样；站内相对链接以文章 URL 为基准绝对化。
+  if (!href || /^(?:[a-z][a-z0-9+.-]*:|#)/i.test(href)) return href;
+  return new URL(href, new URL(`${getPostURL(item)}/`, site)).href;
+}
+
 export const GET: APIRoute = async (context) => {
   const site = context.site ?? "https://199623.xyz";
   const posts = await getPublishedPosts();
 
-  const rssResponse = await rss({
+  return rss({
     title: `${SITE.NAME} - ${HOME.TITLE}`,
     description: SITE.NAME,
     site,
     customData: `<language>zh-cn</language>`,
     items: posts.map((item) => ({
       title: item.data.title,
-      pubDate: item.data.date,
+      // 日历字符串 -> 明确的 UTC 瞬间，避免 RSS 阅读器时区换算倒退一天
+      pubDate: new Date(`${item.data.date}T00:00:00.000Z`),
       // 统一通过 getPostURL 构造链接，避免与页内引用不一致
       link: getPostURL(item),
       content: sanitizeHtml(parser.render(item.body), {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
-        // 收紧图片：仅允许 http/https/同源 data，防止 javascript: 与任意外链注入
+        // 收紧图片：仅允许 http/https/data，避免 javascript: 等危险 URL。
         allowedSchemes: ["http", "https", "data"],
         allowedAttributes: {
           img: ["src", "alt", "title", "width", "height", "loading", "decoding", "srcset", "sizes"],
           a: ["href", "title", "rel", "target"],
         },
-        // 阻止相对 URL 被从 RSS 阅读器原样执行（强制绝对/已知 scheme）
         allowProtocolRelative: false,
         transformTags: {
-          a: (tagName, attribs) => ({
-            tagName,
-            attribs: { ...attribs, rel: "noopener noreferrer", target: "_blank" },
-          }),
-          img: (tagName, attribs) => ({
-            tagName,
-            attribs: { ...attribs, loading: "lazy", decoding: "async" },
-          }),
+          a: (tagName, attribs) => {
+            const href = getRssLinkURL(attribs.href, item, site);
+            const next: Record<string, string> = {
+              ...attribs,
+              rel: "noopener noreferrer",
+              target: "_blank",
+            };
+            if (href) {
+              next.href = href;
+            } else {
+              delete next.href;
+            }
+            return { tagName, attribs: next };
+          },
+          img: (tagName, attribs) => {
+            const src = getRssImageURL(attribs.src, item, site);
+            const next: Record<string, string> = {
+              ...attribs,
+              loading: "lazy",
+              decoding: "async",
+            };
+            if (src) {
+              next.src = src;
+            } else {
+              // 无法解析的图片直接移除 src，避免输出裸属性或相对路径。
+              delete next.src;
+            }
+            return { tagName, attribs: next };
+          },
         },
       }),
     })),
-  });
-
-  const rssText = await rssResponse.text();
-
-  return new Response(rssText, {
-    headers: {
-      "Content-Type": "application/xml; charset=utf-8",
-    },
   });
 };

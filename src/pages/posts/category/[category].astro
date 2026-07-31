@@ -1,0 +1,22 @@
+---
+import PageLayout from "@layouts/PageLayout.astro";
+import Container from "@components/Container.astro";
+import PostArchive from "@components/PostArchive.astro";
+import { getPublishedPosts } from "@lib/utils";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  const categories = [...new Set(posts.map((post) => post.data.category))];
+
+  return categories.map((category) => ({ params: { category } }));
+}
+
+const posts = await getPublishedPosts();
+const category = Astro.params.category!;
+---
+
+<PageLayout title={`文章：${category}`} description={`分类「${category}」下的所有文章`}>
+  <Container>
+    <PostArchive posts={posts} activeCategory={category} />
+  </Container>
+</PageLayout>

@@ -1,24 +1,18 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { getCollection, type CollectionEntry } from "astro:content";
-import sanitizeHtml from "sanitize-html";
+import MarkdownIt from "markdown-it";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatDate(date: Date) {
-  return date.toLocaleDateString("zh-CN", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).replace(/\//g, "-");
+export function formatDate(date: string) {
+  return date;
 }
 
-export function formatShortDate(date: Date) {
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${month}-${day}`;
+export function formatShortDate(date: string) {
+  return date.slice(5, 10);
 }
 
 export function getPostSlug(id: string) {
@@ -33,32 +27,48 @@ export function getPostURL(entry: CollectionEntry<"posts">): string {
   return `/${entry.collection}/${getPostSlug(entry.id)}`;
 }
 
+export function getPostCategoryURL(category?: string): string {
+  return category ? `/posts/category/${encodeURIComponent(category)}` : "/posts";
+}
+
 export async function getPublishedPosts() {
   return (await getCollection("posts"))
     .filter((p) => !p.data.draft)
-    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+    .sort((a, b) => b.data.date.localeCompare(a.data.date));
 }
 
-const EXCERPT_TAG_RE = /<[^>]+>/g;
 const EXCERPT_WS_RE = /\s+/g;
+const excerptMarkdown = new MarkdownIt({ html: false });
+const excerptCache = new Map<string, string>();
+
+function getPostPlainText(body: string): string {
+  const cached = excerptCache.get(body);
+  if (cached !== undefined) return cached;
+
+  const plain = excerptMarkdown
+    .parse(body, {})
+    .flatMap((token) => token.type === "inline" ? token.children ?? [] : [])
+    .flatMap((token) => {
+      if (token.type === "text" || token.type === "code_inline") return token.content;
+      if (token.type === "image") return token.content;
+      if (token.type === "softbreak" || token.type === "hardbreak") return " ";
+      return [];
+    })
+    .join("")
+    .replace(EXCERPT_WS_RE, " ")
+    .trim();
+
+  excerptCache.set(body, plain);
+  return plain;
+}
 
 /**
- * 提取文章纯文本摘要。
- * 使用 sanitize-html 做稳健的 HTML 清洗（可处理嵌套/注释/CDATA），输出纯文本后按字符截断。
+ * 提取文章 Markdown 的纯文本摘要。
+ * MarkdownIt 会解码实体、移除格式标记，并保留链接文字与图片替代文本。
  * CJK 无词边界，按字符直接 slice 即可，无需做边界回溯。
  */
 export function getPostExcerpt(body: string, maxLength = 150): string {
-  // allowedTags 为空时 sanitize-html 会剥离所有标签并返回纯文本
-  const plain = sanitizeHtml(body, {
-    allowedTags: [],
-    allowedAttributes: {},
-    disallowedTagsMode: "discard",
-  })
-    .replace(EXCERPT_TAG_RE, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&[a-z#0-9]+;/g, " ")
-    .replace(EXCERPT_WS_RE, " ")
-    .trim();
+  const plain = getPostPlainText(body);
 
   if (plain.length <= maxLength) return plain;
   return plain.slice(0, maxLength) + "…";
