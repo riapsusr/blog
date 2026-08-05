@@ -151,12 +151,6 @@
       const updateRect = () => { rect = logo.getBoundingClientRect(); };
       window.addEventListener("resize", updateRect, { passive: true });
 
-      // 仅当指针位于 logo 周边合理范围内才更新姿态；离开范围只重置一次。
-      const PROXIMITY = 320;
-      const inRange = (clientX: number, clientY: number) =>
-        clientX >= rect.left - PROXIMITY && clientX <= rect.right + PROXIMITY &&
-        clientY >= rect.top - PROXIMITY && clientY <= rect.bottom + PROXIMITY;
-
       let poseActive = false;
 
       const move = (clientX: number, clientY: number) => {
@@ -188,16 +182,18 @@
 
       let nextFrame = 0;
       const handlePointerMove = (event: PointerEvent) => {
-        if (!inRange(event.clientX, event.clientY)) {
-          if (poseActive) {
-            poseActive = false;
-            resetPose();
-          }
-          return;
-        }
+        // 页面内任意位置都跟随；仅做 rAF 节流，不触发布局读取。
         poseActive = true;
         window.cancelAnimationFrame(nextFrame);
         nextFrame = window.requestAnimationFrame(() => move(event.clientX, event.clientY));
+      };
+
+      // 指针离开浏览器窗口时归位一次（relatedTarget 为 null 表示离开文档）。
+      const handlePointerOut = (event: PointerEvent) => {
+        if (event.relatedTarget === null && poseActive) {
+          poseActive = false;
+          resetPose();
+        }
       };
 
       let blinkTimer: ReturnType<typeof setTimeout> | null = null;
@@ -241,12 +237,14 @@
 
       window.addEventListener("pointermove", handlePointerMove, { passive: true });
       window.addEventListener("resize", updateRect, { passive: true });
+      document.addEventListener("pointerout", handlePointerOut, { passive: true });
       document.addEventListener("visibilitychange", handleVisibilityChange);
       blinkTimer = setTimeout(blink, Math.random() * 1800 + 1200);
 
       cleanups.push(() => {
         window.removeEventListener("pointermove", handlePointerMove);
         window.removeEventListener("resize", updateRect);
+        document.removeEventListener("pointerout", handlePointerOut);
         document.removeEventListener("visibilitychange", handleVisibilityChange);
         if (nextFrame) window.cancelAnimationFrame(nextFrame);
         if (blinkTimer) { clearTimeout(blinkTimer); blinkTimer = null; }
