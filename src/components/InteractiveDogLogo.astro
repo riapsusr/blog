@@ -149,7 +149,6 @@
       // 缓存 rect，避免每次 pointermove 都读布局。
       let rect = logo.getBoundingClientRect();
       const updateRect = () => { rect = logo.getBoundingClientRect(); };
-      window.addEventListener("resize", updateRect, { passive: true });
 
       let poseActive = false;
 

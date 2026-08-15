@@ -1,8 +1,9 @@
-import type { Site, Metadata, NavItem } from "@types";
+import type { Site, Metadata, NavItem } from "./types";
 
 export const SITE: Site = {
   NAME: "Syu's Blog",
   NUM_POSTS_ON_HOMEPAGE: 5,
+  FOUNDED_YEAR: 2025,
 };
 
 export const HOME: Metadata = {

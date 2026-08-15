@@ -1,4 +1,5 @@
 ---
+import type { CollectionEntry } from "astro:content";
 import PageLayout from "@layouts/PageLayout.astro";
 import Container from "@components/Container.astro";
 import PostArchive from "@components/PostArchive.astro";
@@ -8,10 +9,15 @@ export async function getStaticPaths() {
   const posts = await getPublishedPosts();
   const categories = [...new Set(posts.map((post) => post.data.category))];
 
-  return categories.map((category) => ({ params: { category } }));
+  // posts 通过 props 传入，避免页面 frontmatter 再次拉取/排序。
+  return categories.map((category) => ({ params: { category }, props: { posts } }));
 }
 
-const posts = await getPublishedPosts();
+interface Props {
+  posts: CollectionEntry<"posts">[];
+}
+
+const { posts } = Astro.props;
 const category = Astro.params.category!;
 ---
 

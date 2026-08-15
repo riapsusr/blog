@@ -5,9 +5,7 @@ import Container from "@components/Container.astro";
 ---
 
 <PageLayout title="搜索" description="站内文章搜索">
-  <slot name="head" slot="head">
-    <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
-  </slot>
+  <link slot="head" href="/pagefind/pagefind-ui.css" rel="stylesheet" />
   <Container>
     <div class="space-y-10 min-h-[50vh]">
       <h1 class="font-semibold text-fg dark:text-fg-invert text-xl">搜索</h1>

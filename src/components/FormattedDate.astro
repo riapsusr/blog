@@ -1,6 +1,4 @@
 ---
-import { formatDate } from "@lib/utils";
-
 interface Props {
   date: string;
 }
@@ -9,5 +7,5 @@ const { date } = Astro.props;
 ---
 
 <time datetime={date}>
-  {formatDate(date)}
+  {date}
 </time>

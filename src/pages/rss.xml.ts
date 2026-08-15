@@ -35,11 +35,13 @@ function getRssImageURL(src: string | undefined, item: CollectionEntry<"posts">,
 function getRssLinkURL(href: string | undefined, item: CollectionEntry<"posts">, site: URL | string): string | undefined {
   // 外链、锚点等保持原样；站内相对链接以文章 URL 为基准绝对化。
   if (!href || /^(?:[a-z][a-z0-9+.-]*:|#)/i.test(href)) return href;
-  return new URL(href, new URL(`${getPostURL(item)}/`, site)).href;
+  return new URL(href, new URL(getPostURL(item), site)).href;
 }
 
 export const GET: APIRoute = async (context) => {
-  const site = context.site ?? "https://199623.xyz";
+  // RSS 需要绝对 URL；site 已在 astro.config.mjs 配置，未配置时直接失败并给出明确原因。
+  const site = context.site;
+  if (!site) throw new Error("RSS 生成需要 site 配置（astro.config.mjs）");
   const posts = await getPublishedPosts();
 
   return rss({
@@ -55,8 +57,10 @@ export const GET: APIRoute = async (context) => {
       link: getPostURL(item),
       content: sanitizeHtml(parser.render(item.body), {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
-        // 收紧图片：仅允许 http/https/data，避免 javascript: 等危险 URL。
-        allowedSchemes: ["http", "https", "data"],
+        // 默认仅允许 http/https/mailto；data: 只对 img 放行，
+        // 避免 <a href="data:..."> 之类的注入面。
+        allowedSchemes: ["http", "https", "mailto"],
+        allowedSchemesByTag: { img: ["http", "https", "data"] },
         allowedAttributes: {
           img: ["src", "alt", "title", "width", "height", "loading", "decoding", "srcset", "sizes"],
           a: ["href", "title", "rel", "target"],

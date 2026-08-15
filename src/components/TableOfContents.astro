@@ -252,16 +252,10 @@ const tocItems = headings.filter((h) => h.depth === 2);
     }
 
     observer = new IntersectionObserver(
-      (entries) => {
-        // 仅保留当前正进入视口的标题，但完全依赖 IO 在快速滚动时可能滞后，
-        // 因此刷新一次 scroll 计算作为权威源。
+      () => {
+        // IO 仅作为触发时机（布局变化、锚点跳转等不触发 scroll 的场景）；
+        // 激活态一律由 updateByScroll 计算，保持单一权威源。
         updateByScroll();
-        // 触发结束后让 IO 也参与（避免 scroll 漏掉刚 enter 的）
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setActive(entry.target.id);
-          }
-        }
       },
       {
         rootMargin: "-80px 0px -70% 0px",

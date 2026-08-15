@@ -6,8 +6,7 @@
       "@components/*": ["./src/components/*"],
       "@layouts/*": ["./src/layouts/*"],
       "@lib/*": ["./src/lib/*"],
-      "@consts": ["./src/consts.ts"],
-      "@types": ["./src/types.ts"]
+      "@consts": ["./src/consts.ts"]
     }
   }
 }

@@ -72,7 +72,7 @@ draft: false
 ## Key files
 - `src/content/config.ts` — post collection schema（date 为日历字符串）
 - `src/layouts/PageLayout.astro` — shared page shell (含 head slot)
-- `src/lib/utils.ts` — `getPostURL` / `getPostCategoryURL` / `getPostExcerpt` 等集中工具，所有文章链接构造必须走此模块；摘要用 MarkdownIt 解析纯文本（body 级缓存）
+- `src/lib/utils.ts` — `getPostURL` / `getPostCategoryURL` / `getPostExcerpt` 等集中工具，所有文章链接构造必须走此模块；`getPostURL` 返回**带尾斜杠**的 URL（与目录格式构建的 canonical/sitemap 一致，避免线上 308 重定向）；摘要用 MarkdownIt 解析纯文本（body 级缓存）
 - `src/env.d.ts` — `window` 上各页面 cleanup hook 的类型声明
 - `src/styles/global.css` — global visual system
 - `tailwind.config.mjs` — semantic colors (`fg` / `fg-invert` / `body` / `muted` / `surface*` / `control*` / `line` / `line-soft` / `decoration` / `overlay` / `accent` / `highlight`)，避免散落硬编码 `text-black` / `text-stone-500`
@@ -96,9 +96,8 @@ draft: false
 - `@layouts/*`    -> `src/layouts/*`
 - `@lib/*`        -> `src/lib/*`
 - `@consts`       -> `src/consts.ts`
-- `@types`        -> `src/types.ts`
 
-Astro reads these aliases from `tsconfig.json` and applies them to both Vite (build) and the TS language server (IDE). Do not use a bare `@*` wildcard — it risks colliding with npm package scopes like `@vercel`.
+Astro reads these aliases from `tsconfig.json` and applies them to both Vite (build) and the TS language server (IDE). Do not use a bare `@*` wildcard — it risks colliding with npm package scopes like `@vercel` or `@types`; `src/types.ts` therefore uses relative imports.
 
 ## Client-side script conventions
 View Transitions are currently disabled (see `src/components/Head.astro`). The page-level client scripts (Footer theme toggle, TableOfContents, InteractiveDogLogo, pagefind) are written for a single page load. They each guard against repeat initialization via a unified `__cleanup*` hook on `window`（如 `__tocCleanup__` / `__cleanupDogLogo__` / `__cleanupThemeToggle__` / `__cleanupPagefind__`），hook 类型集中在 `src/env.d.ts`。模式为：脚本开头先调用同名旧 hook（若有），结束时注册新的 cleanup；cleanup 必须移除全部监听、取消 timer/rAF，避免未来启用 View Transitions 时泄漏。

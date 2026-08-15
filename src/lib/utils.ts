@@ -7,10 +7,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatDate(date: string) {
-  return date;
-}
-
 export function formatShortDate(date: string) {
   return date.slice(5, 10);
 }
@@ -21,10 +17,12 @@ export function getPostSlug(id: string) {
 
 /**
  * 统一构造文章的 URL。
- * 集中所有「collection + slug」拼接逻辑，避免页内、RSS、卡片各写一遍导致尾斜杠不一致。
+ * 集中所有「collection + slug」拼接逻辑，避免页内、RSS、卡片各写一遍。
+ * 带尾斜杠以匹配目录格式的静态构建（canonical/sitemap 也是带斜杠形式），
+ * 避免线上每次点击都先吃一次 308 重定向。
  */
 export function getPostURL(entry: CollectionEntry<"posts">): string {
-  return `/${entry.collection}/${getPostSlug(entry.id)}`;
+  return `/${entry.collection}/${getPostSlug(entry.id)}/`;
 }
 
 export function getPostCategoryURL(category?: string): string {
